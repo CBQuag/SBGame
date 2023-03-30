@@ -13,6 +13,7 @@ result.innerHTML='';
 let correctIndex;
 let randAnime;
 
+let score=0;
 
 //function to get random numbers
 let getRand=(num)=>Math.floor(Math.random()*num);
@@ -126,11 +127,21 @@ fetch('https://www.sakugabooru.com/tag.json?limit=0&type=3',{cache: 'no-cache'})
             form.addEventListener('submit',(e)=>{
                 const data= new FormData(form);
                 for(const entry of data){
-                    entry[1]==correctIndex?result.innerHTML='Correct!':result.innerHTML=='Correct!'?null:result.innerHTML+='X';
 
-                    //UNFINISHED will show the correct answer after three tries
-                    result.innerHTML=='XXX'?result.innerHTML=correctIndex:null;
-                    e.preventDefault();
+                    if(entry[1]==correctIndex){
+                        result.innerHTML='Correct!';
+                        score++;
+                    }else{
+                        result.innerHTML+='X';
+                    }
+                    console.log(score);
+
+                    e.preventDefault()
+                    if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
+                        setTimeout(function(){
+                            window.location.reload()
+                        },2000);
+                    }
                 }
             })
         });
