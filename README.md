@@ -1,5 +1,7 @@
 Sakugabooru game
 
+IDEAS
+
 Series or Animator
 
 Timed, three* strikes, or free play with a ratio at the end
@@ -27,3 +29,7 @@ Either way, answer is revealed with a link to the tag
 
 At the end, score is shown and added to a leaderboard
     Maybe with a review of answers
+
+
+PLANS
+
