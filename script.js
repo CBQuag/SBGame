@@ -16,6 +16,12 @@ let correctAnime;
 
 let url='https://www.sakugabooru.com/'
 
+let wait=0;
+
+let scoreJSON=localStorage.getItem('scoreItem');
+let scoreItem=JSON.parse(scoreJSON);
+scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
+
 
 
 //function to get random numbers
@@ -59,15 +65,15 @@ validateVideoContent=(promiseResults)=>{
             if(isSafe(tempVid)){
                 return tempVid;
             }else{
-                console.log('Not safe for work')
+                console.log('Not safe for work.')
                 return false;
             }
         }else{
-            console.log('Not an anime');
+            console.log('Not an anime.');
             return false;
         }
     }else{
-        console.log('No Video Content!');
+        console.log('No Video Content.');
         return false;
     }
 }
@@ -155,6 +161,8 @@ let resolveVideoContent=(source)=>{
 
 
 async function buildGame(){
+    let score=2;
+    let miss=0;
     let answerContent = await resolveProperAnswer();
     let videoContent= await resolveVideoContent(answerContent)
     
@@ -171,14 +179,34 @@ async function buildGame(){
                 result.innerHTML='Correct!';
             }else{
                 result.innerHTML+='X';
+                score-=1;
             }
 
             if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
+                result.innerHTML==('XX')?miss=1:null;
                 let correctListItem=answers[correctIndex];
                 correctListItem.setAttribute('class','correctLi')
+
+                
+                scoreItem.score+=score;
+                scoreItem.misses+=miss;
+
+                if(scoreItem.misses>2){
+                    console.log('Game Over...')
+                    console.log(`Your score for this round: ${scoreItem.score}`);
+                    scoreItem.score>scoreItem.topScore?scoreItem.topScore=scoreItem.score:null;
+                    console.log(`Your high score:           ${scoreItem.topScore}`)
+                    scoreItem.score=0;
+                    scoreItem.misses=0;
+                    wait=3500;
+                }else{console.log(`Current Score: ${scoreItem.score}`);}
+                
+                scoreJSON=JSON.stringify(scoreItem);
+                localStorage.setItem('scoreItem',scoreJSON);
+
                 setTimeout(function(){
-                    window.location.reload()
-                },2000);
+                    window.location.reload();
+                },1500+wait);
             }
         }
     })
