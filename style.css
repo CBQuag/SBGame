@@ -17,6 +17,11 @@ h1{
 video{
     width: 100%;
 }
+#score-window{
+    display: flex;
+    justify-content: center;
+    justify-content: space-evenly;
+}
 #answer-box{
     width: 80%;
     margin: auto;

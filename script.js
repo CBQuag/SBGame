@@ -22,6 +22,12 @@ let scoreJSON=localStorage.getItem('scoreItem');
 let scoreItem=JSON.parse(scoreJSON);
 scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
 
+let currentScoreDisplay=document.getElementById('current-score');
+currentScoreDisplay.innerHTML+=scoreItem.score;
+let highScoreDisplay=document.getElementById('high-score');
+highScoreDisplay.innerHTML+=scoreItem.topScore;
+let triesLeft=document.getElementById('tries-left');
+triesLeft.innerHTML+=(3-scoreItem.misses)
 
 
 //function to get random numbers
