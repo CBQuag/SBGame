@@ -32,6 +32,17 @@ ul{
     display: flex;
     justify-content: center;
 }
+.correctLi{
+    background-color: rgb(204, 0, 0);
+    animation: fadein 0.5s ease-in;
+}
+@keyframes fadein {
+    0%{background:  rgba(204, 0, 0, 0);}
+    25%{background: rgba(204, 0, 0, 0.25);}
+    50%{background: rgba(204, 0, 0, 0.5);}
+    75%{background: rgba(204, 0, 0, 0.75);}
+    100%{background:rgba(204, 0, 0, 1);}
+}
 
 @media (min-width: 400px){
     #answer-box{

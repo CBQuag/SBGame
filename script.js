@@ -92,6 +92,7 @@ let fillOutAnswers=(source, answer)=>{
             inner=choice.lastElementChild;
             adjustedName=humanize(answer);
             inner.innerHTML=adjustedName;
+            return correctIndex;
         }
         //fills in other answers
         else{    
@@ -160,7 +161,7 @@ async function buildGame(){
     fetchSeriesList().then(source=>fillOutAnswers(source,answerContent))
     videoPlayer.setAttribute('src', `${videoContent}`);
     console.log(`${humanize(answerContent)} is the answer`);
-
+    
     //checks if the answer is right
     form.addEventListener('submit',(e)=>{
         e.preventDefault()
@@ -173,6 +174,8 @@ async function buildGame(){
             }
 
             if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
+                let correctListItem=answers[correctIndex];
+                correctListItem.setAttribute('class','correctLi')
                 setTimeout(function(){
                     window.location.reload()
                 },2000);
