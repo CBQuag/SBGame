@@ -17,6 +17,8 @@ let correctAnime;
 let url='https://www.sakugabooru.com/'
 
 let wait=0;
+let score=2;
+let miss=0;
 
 let scoreJSON=localStorage.getItem('scoreItem');
 let scoreItem=JSON.parse(scoreJSON);
@@ -27,7 +29,10 @@ currentScoreDisplay.innerHTML+=scoreItem.score;
 let highScoreDisplay=document.getElementById('high-score');
 highScoreDisplay.innerHTML+=scoreItem.topScore;
 let triesLeft=document.getElementById('tries-left');
-triesLeft.innerHTML+=(3-scoreItem.misses)
+triesLeft.innerHTML=''
+for(let x=0;x<scoreItem.misses;x++){
+    triesLeft.innerHTML+='X'
+}
 
 
 //function to get random numbers
@@ -165,10 +170,42 @@ let resolveVideoContent=(source)=>{
 }
 
 
+let resolveScore=()=>{
+    if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
+        result.innerHTML==('XX')?miss=1:null;
+        let correctListItem=answers[correctIndex];
+        correctListItem.setAttribute('class','correctLi')
+
+        
+        scoreItem.score+=score;
+        scoreItem.misses+=miss;
+
+        if(scoreItem.misses>2){
+            triesLeft.innerHTML+='X'
+            console.log('Game Over...');
+            result.innerHTML='Game Over...';
+            console.log(`Your score for this round: ${scoreItem.score}`);
+            if(scoreItem.score>scoreItem.topScore){
+                scoreItem.topScore=scoreItem.score;
+                result.innerHTML='New High Score!';
+            }
+            console.log(`Your high score:           ${scoreItem.topScore}`)
+            scoreItem.score=0;
+            scoreItem.misses=0;
+            wait=3500;
+        }else{console.log(`Current Score: ${scoreItem.score}`);}
+        
+        scoreJSON=JSON.stringify(scoreItem);
+        localStorage.setItem('scoreItem',scoreJSON);
+
+        setTimeout(function(){
+            window.location.reload();
+        },1500+wait);
+    }
+}
+
 
 async function buildGame(){
-    let score=2;
-    let miss=0;
     let answerContent = await resolveProperAnswer();
     let videoContent= await resolveVideoContent(answerContent)
     
@@ -176,7 +213,20 @@ async function buildGame(){
     videoPlayer.setAttribute('src', `${videoContent}`);
     console.log(`${humanize(answerContent)} is the answer`);
     
-    //checks if the answer is right
+    document.addEventListener('keypress', (e)=>{
+        console.log(correctIndex)
+        console.log(e.code.slice(e.code.length-1))
+        if(e.code.slice(e.code.length-1)==correctIndex+1){
+            result.innerHTML='Correct!';
+        }else{
+            result.innerHTML+='X';
+            score-=1;
+        }
+
+        resolveScore()
+    })
+
+    //checks if the submitted answer is right
     form.addEventListener('submit',(e)=>{
         e.preventDefault()
         const data= new FormData(form);
@@ -188,32 +238,7 @@ async function buildGame(){
                 score-=1;
             }
 
-            if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
-                result.innerHTML==('XX')?miss=1:null;
-                let correctListItem=answers[correctIndex];
-                correctListItem.setAttribute('class','correctLi')
-
-                
-                scoreItem.score+=score;
-                scoreItem.misses+=miss;
-
-                if(scoreItem.misses>2){
-                    console.log('Game Over...')
-                    console.log(`Your score for this round: ${scoreItem.score}`);
-                    scoreItem.score>scoreItem.topScore?scoreItem.topScore=scoreItem.score:null;
-                    console.log(`Your high score:           ${scoreItem.topScore}`)
-                    scoreItem.score=0;
-                    scoreItem.misses=0;
-                    wait=3500;
-                }else{console.log(`Current Score: ${scoreItem.score}`);}
-                
-                scoreJSON=JSON.stringify(scoreItem);
-                localStorage.setItem('scoreItem',scoreJSON);
-
-                setTimeout(function(){
-                    window.location.reload();
-                },1500+wait);
-            }
+            resolveScore()
         }
     })
 }

@@ -21,6 +21,13 @@ video{
     display: flex;
     justify-content: center;
     justify-content: space-evenly;
+    margin:auto;
+    max-width: 600px;
+}
+#current-score,#high-score,#tries-left{
+    color: rgb(204, 0, 0);
+    display: flex;
+    justify-content: center;
 }
 #answer-box{
     width: 80%;

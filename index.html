@@ -15,12 +15,18 @@
         <h1>SAKUGA <span style="color: rgb(204, 0, 0)">CHALLENGE</span></h1>
     </header>
     <div id="video-box">
-        <video width="100%" loop muted ></video>
+        <video width="100%" loop muted autoplay></video>
     </div>
     <div id="score-window">
-        <h4 id="current-score">Current Score: </h4>
-        <h4 id="high-score">High Score: </h4>
-        <h4 id="tries-left">Tries Left: </h4>
+        <div id="score-box">
+            <h4>Score</h4><h2 id="current-score"></h2>
+        </div>
+        <div id="goal-box">
+            <h4>High Score</h4><h2 id="high-score"></h2>
+        </div>
+        <div id="tries-box">
+            <h4>Strikes</h4><h2 id="tries-left"></h2>
+        </div>
     </div>
     <form>
         <fieldset id="answer-box">
