@@ -16,8 +16,11 @@ let correctAnime;
 
 let url='https://www.sakugabooru.com/'
 
+
+
 //function to get random numbers
 let getRand=(num)=>Math.floor(Math.random()*num);
+
 
 //function to convert strings to more readable formats
 humanize=(str)=>{
@@ -32,8 +35,10 @@ humanize=(str)=>{
 //takes a video link and checks if it's a video
 let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
 
+
 //checks the item to see if it's an anime or not based on the tags
 let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
+
 
 //checks for content
 let isSafe=(temp)=>temp.rating=='s';
@@ -67,10 +72,12 @@ validateVideoContent=(promiseResults)=>{
     }
 }
 
+
 //gets random titles from the source
 let getRandomTitle=(source)=>{
     return source[getRand(source.length)].name
 };
+
 
 let fillOutAnswers=(source, answer)=>{
     //pick a random answer number to be the correct one
@@ -96,10 +103,9 @@ let fillOutAnswers=(source, answer)=>{
 }
 
 
-
-
 let fetchSeriesList=()=>fetch(`${url}tag.json?limit=0&type=3`).then(response=>response.ok?response.json():null)
 let fetchFromTag=(tag)=>fetch(`${url}post.json?tags=${tag}`).then(response=>response.ok?response.json():null)
+
 
 let resolveProperAnswer=()=>{
     let answerPromise = new Promise(resolve=>{
@@ -118,17 +124,19 @@ let resolveProperAnswer=()=>{
                     resolve(tempAnswer)
                 }else{
                     console.log('Getting a new result...')
-                    throw new Error('Invalid answer')
+                    resolve(resolveProperAnswer())
                 }
-            }).catch(()=>resolveProperAnswer())                
+            })              
         })       
     })
     return answerPromise;
 }
 
+
 let resolveVideoContent=(source)=>{
     return new Promise(resolve=>{
         let validLink=null;
+        
         fetchFromTag(source).then(content=>{
             let correctVideo=validateVideoContent(content);
             correctVideo?validLink=true:validLink=false;
@@ -137,11 +145,12 @@ let resolveVideoContent=(source)=>{
                 resolve(correctVideo.file_url)
             }else{
                 console.log('Getting a new video...')
-                resolveVideoContent(source)
+                resolve(resolveVideoContent(source))
             }
         })
     })
 }
+
 
 
 async function buildGame(){
@@ -173,74 +182,3 @@ async function buildGame(){
 }
 
 buildGame();
-
-
-
-
-
-
-
-
-
-
-
-//=============================================================================
-//OLD IMPLEMENTATION
-
-// //gets the list of all shows
-// fetch(`${url}tag.json?limit=0&type=3`,{cache: 'no-cache'})
-// .then(response=>response.ok?response.json():null)
-// .then(jsonResponse=>{
-    
-//     let getRandomTags=()=>{
-    
-//         //get a random name from the list
-//         correctAnime=getRandomTitle(jsonResponse)
-
-//         fillOutAnswers(jsonResponse, correctAnime)
-    
-//         //takes the name chosen, then gets all the items that have that tag
-//         fetch(`${url}post.json?tags=${correctAnime}`,{cache: 'no-cache'}
-//         ).then(response=>response.ok?response.json():null
-//         ).then(jsonResponse=>{
-
-//             //adds a random video from that set of items to a video element
-//             let randomClip=validateVideoContent(jsonResponse).file_url;
-//             //if there are no videos to play, it will restart the call to get another tag
-//             randomClip?null:getRandomTags();
-//             //sets the video
-//             videoPlayer.setAttribute('src', `${randomClip}`);
-
-
-//             console.log('check 1');
-
-//             //when you  click submit, it determines if the answer was right
-//             form.addEventListener('submit',(e)=>{
-//                 const data= new FormData(form);
-//                 for(const entry of data){
-
-
-//                     console.log('check 2');
-
-//                     if(entry[1]==correctIndex){
-//                         result.innerHTML='Correct!';
-//                         score++;
-//                     }else{
-//                         result.innerHTML+='X';
-//                     }
-//                     console.log(score);
-
-//                     e.preventDefault()
-//                     if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
-//                         setTimeout(function(){
-//                             window.location.reload()
-//                         },2000);
-//                     }
-//                 }
-//             })
-//         });
-//     }
-//     //getRandomTags();
-// });
-
-
