@@ -29,6 +29,8 @@ currentScoreDisplay.innerHTML+=scoreItem.score;
 let highScoreDisplay=document.getElementById('high-score');
 highScoreDisplay.innerHTML+=scoreItem.topScore;
 let triesLeft=document.getElementById('tries-left');
+
+//draws x's for strikes
 triesLeft.innerHTML=''
 for(let x=0;x<scoreItem.misses;x++){
     triesLeft.innerHTML+='X'
@@ -206,21 +208,25 @@ let resolveScore=()=>{
 
 
 async function buildGame(){
+    //gets an appropriate series and video
     let answerContent = await resolveProperAnswer();
     let videoContent= await resolveVideoContent(answerContent)
     
+    //fills out answers and displays video
     fetchSeriesList().then(source=>fillOutAnswers(source,answerContent))
     videoPlayer.setAttribute('src', `${videoContent}`);
     console.log(`${humanize(answerContent)} is the answer`);
     
+    //checks if the keypress matches the correct answer
     document.addEventListener('keypress', (e)=>{
-        console.log(correctIndex)
-        console.log(e.code.slice(e.code.length-1))
-        if(e.code.slice(e.code.length-1)==correctIndex+1){
-            result.innerHTML='Correct!';
-        }else{
-            result.innerHTML+='X';
-            score-=1;
+        let keyIndex=e.code.slice(e.code.length-1)
+        if((keyIndex>0)&&(keyIndex<=4)){
+            if(keyIndex==correctIndex+1){
+                result.innerHTML='Correct!';
+            }else{
+                result.innerHTML+='X';
+                score-=1;
+            }
         }
 
         resolveScore()
