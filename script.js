@@ -16,13 +16,12 @@ let correctAnime;
 let url='https://www.sakugabooru.com/'
 
 async function bypassCors(link){
-    console.log('trying cors unblocking...')
     const Aurl = 'https://cors-proxy3.p.rapidapi.com/api';
     const options = {
         method: 'POST',
         headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
+            'X-RapidAPI-Key': '3fb322ff20mshe3a2b6a9e4e427ep100c0cjsna68471747f6d',
             'X-RapidAPI-Host': 'cors-proxy3.p.rapidapi.com'
         },
         body: new URLSearchParams({
@@ -32,8 +31,7 @@ async function bypassCors(link){
 
     try {
         const response = await fetch(Aurl, options);
-        const result = await response.text();
-        console.log(result)
+        const result = await response.json();
         return result;
     } catch (error) {
         console.error(error);
@@ -73,6 +71,92 @@ humanize=(str)=>{
       frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
     }
     return frags.join(' ');
+}
+
+
+//gets random titles from the source
+let getRandomTitle=(source)=>{
+    return source[getRand(source.length)].name
+};
+
+
+let fillOutAnswers=(source, answer)=>{
+    //pick a random answer number to be the correct one
+    correctIndex=getRand(4);
+    let inner;
+    let adjustedName;
+
+    //fills in the answers on the page
+    answers.forEach(choice=>{
+        //fills in correct answer
+        if(answers.indexOf(choice)==correctIndex){
+            inner=choice.lastElementChild;
+            adjustedName=humanize(answer);
+            inner.innerHTML=adjustedName;
+            return correctIndex;
+        }
+        //fills in other answers
+        else{    
+            adjustedName=humanize(getRandomTitle(source))       
+            inner=choice.lastElementChild;
+            inner.innerHTML=adjustedName;
+        }
+    })
+}
+
+
+// let fetchSeriesList=()=>fetch(`${url}tag.json?limit=0&type=3`).then(response=>response.ok?response.json():null)
+// let fetchFromTag=(tag)=>fetch(`${url}post.json?tags=${tag}`).then(response=>response.ok?response.json():null)
+
+
+
+let resolveAnswer=async (sList)=>{
+       
+    let answerPromise = new Promise(resolve=>{
+
+        console.log('Getting an answer...')
+
+        resolve(getRandomTitle(sList));
+         
+    })
+
+    return answerPromise;    
+}
+
+let resolveProperAnswer = async (tag) =>{
+    let currentSeries = await bypassCors(`${url}post.json?tags=${tag}`)
+    let correctAnswerPromise = new Promise (resolve=>{
+        console.log('Filtering...');
+        let correctAnswer=validateVideoContent(currentSeries);
+        correctAnswer?validLink=true:validLink=false;
+        if(validLink){
+            console.log('Got an answer!')
+            resolve(correctAnswer)
+        }else{
+            console.log('Getting a new result...')
+            resolve(false)
+        }
+    })
+    return correctAnswerPromise;
+}
+
+
+let resolveVideoContent=(source)=>{
+    return new Promise(resolve=>{
+        let validLink=null;
+        
+        fetchFromTag(source).then(content=>{
+            let correctVideo=validateVideoContent(content);
+            correctVideo?validLink=true:validLink=false;
+            if(validLink){
+                console.log('Got a Video!')
+                resolve(correctVideo.file_url)
+            }else{
+                console.log('Getting a new video...')
+                resolve(resolveVideoContent(source))
+            }
+        })
+    })
 }
 
 
@@ -117,91 +201,6 @@ validateVideoContent=(promiseResults)=>{
 }
 
 
-//gets random titles from the source
-let getRandomTitle=(source)=>{
-    return source[getRand(source.length)].name
-};
-
-
-let fillOutAnswers=(source, answer)=>{
-    //pick a random answer number to be the correct one
-    correctIndex=getRand(4);
-    let inner;
-    let adjustedName;
-
-    //fills in the answers on the page
-    answers.forEach(choice=>{
-        //fills in correct answer
-        if(answers.indexOf(choice)==correctIndex){
-            inner=choice.lastElementChild;
-            adjustedName=humanize(answer);
-            inner.innerHTML=adjustedName;
-            return correctIndex;
-        }
-        //fills in other answers
-        else{    
-            adjustedName=humanize(getRandomTitle(source))       
-            inner=choice.lastElementChild;
-            inner.innerHTML=adjustedName;
-        }
-    })
-}
-
-
-let fetchSeriesList=()=>fetch(`${url}tag.json?limit=0&type=3`).then(response=>response.ok?response.json():null)
-let fetchFromTag=(tag)=>fetch(`${url}post.json?tags=${tag}`).then(response=>response.ok?response.json():null)
-
-async function fetchSeriesListCORS(){
-    let currentPost=await bypassCors('https://www.sakugabooru.com/post.json?limit=1');
-    console.log(currentPost);
-}
-
-
-let resolveProperAnswer=()=>{
-    let answerPromise = new Promise(resolve=>{
-
-        console.log('Getting an answer...')
-        
-        fetchSeriesList().then(jsonResponse=>{
-            let tempAnswer=getRandomTitle(jsonResponse);     
-            let validLink=null;
-            
-            fetchFromTag(tempAnswer).then(embededResponse=>{
-                let correctAnswer=validateVideoContent(embededResponse);
-                correctAnswer?validLink=true:validLink=false;
-                if(validLink){
-                    console.log('Got an answer!')
-                    resolve(tempAnswer)
-                }else{
-                    console.log('Getting a new result...')
-                    resolve(resolveProperAnswer())
-                }
-            })              
-        })       
-    })
-    return answerPromise;
-}
-
-
-let resolveVideoContent=(source)=>{
-    return new Promise(resolve=>{
-        let validLink=null;
-        
-        fetchFromTag(source).then(content=>{
-            let correctVideo=validateVideoContent(content);
-            correctVideo?validLink=true:validLink=false;
-            if(validLink){
-                console.log('Got a Video!')
-                resolve(correctVideo.file_url)
-            }else{
-                console.log('Getting a new video...')
-                resolve(resolveVideoContent(source))
-            }
-        })
-    })
-}
-
-
 let resolveScore=()=>{
     if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
         result.innerHTML==('XX')?miss=1:null;
@@ -236,17 +235,30 @@ let resolveScore=()=>{
     }
 }
 
+async function filterAnswers(SL){
+    let answer= await resolveAnswer(SL);
+    console.log("ANSWER", answer);
+    let correctAnswer=await resolveProperAnswer(answer);
+    console.log("FILTERED ANSWER",correctAnswer);
+    correctAnswer?null:await filterAnswers();
+    return {
+        title:answer,
+        choice:correctAnswer
+    }
+}
 
 async function buildGame(){
+    let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
     //gets an appropriate series and video
-
-    let answerContent = await resolveProperAnswer();
-    let videoContent= await resolveVideoContent(answerContent)
+    let filteredAnswer=await filterAnswers(seriesList);
+    console.log(filteredAnswer.title);
+    
+    let videoContent = await filteredAnswer.choice.file_url
     
     //fills out answers and displays video
-    fetchSeriesList().then(source=>fillOutAnswers(source,answerContent))
+    fillOutAnswers(seriesList,filteredAnswer.title)
     videoPlayer.setAttribute('src', `${videoContent}`);
-    console.log(`${humanize(answerContent)} is the answer`);
+    console.log(`${humanize(filteredAnswer.title)} is the answer`);
     
     //checks if the keypress matches the correct answer
     document.addEventListener('keypress', (e)=>{
