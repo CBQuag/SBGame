@@ -15,6 +15,28 @@ let correctAnime;
 
 let url='https://www.sakugabooru.com/'
 
+let wait=0;
+let score=2;
+let miss=0;
+
+let scoreJSON=localStorage.getItem('scoreItem');
+let scoreItem=JSON.parse(scoreJSON);
+scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
+
+let currentScoreDisplay=document.getElementById('current-score');
+currentScoreDisplay.innerHTML+=scoreItem.score;
+let highScoreDisplay=document.getElementById('high-score');
+highScoreDisplay.innerHTML+=scoreItem.topScore;
+let triesLeft=document.getElementById('tries-left');
+
+//draws x's for strikes
+triesLeft.innerHTML=''
+for(let x=0;x<scoreItem.misses;x++){
+    triesLeft.innerHTML+='X'
+}
+
+
+//Connects to an api that bypasses cors restrictions
 async function bypassCors(link){
     const Aurl = 'https://cors-proxy3.p.rapidapi.com/api';
     const options = {
@@ -39,27 +61,6 @@ async function bypassCors(link){
 }
 
 
-let wait=0;
-let score=2;
-let miss=0;
-
-let scoreJSON=localStorage.getItem('scoreItem');
-let scoreItem=JSON.parse(scoreJSON);
-scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
-
-let currentScoreDisplay=document.getElementById('current-score');
-currentScoreDisplay.innerHTML+=scoreItem.score;
-let highScoreDisplay=document.getElementById('high-score');
-highScoreDisplay.innerHTML+=scoreItem.topScore;
-let triesLeft=document.getElementById('tries-left');
-
-//draws x's for strikes
-triesLeft.innerHTML=''
-for(let x=0;x<scoreItem.misses;x++){
-    triesLeft.innerHTML+='X'
-}
-
-
 //function to get random numbers
 let getRand=(num)=>Math.floor(Math.random()*num);
 
@@ -79,37 +80,7 @@ let getRandomTitle=(source)=>{
     return source[getRand(source.length)].name
 };
 
-
-let fillOutAnswers=(source, answer)=>{
-    //pick a random answer number to be the correct one
-    correctIndex=getRand(4);
-    let inner;
-    let adjustedName;
-
-    //fills in the answers on the page
-    answers.forEach(choice=>{
-        //fills in correct answer
-        if(answers.indexOf(choice)==correctIndex){
-            inner=choice.lastElementChild;
-            adjustedName=humanize(answer);
-            inner.innerHTML=adjustedName;
-            return correctIndex;
-        }
-        //fills in other answers
-        else{    
-            adjustedName=humanize(getRandomTitle(source))       
-            inner=choice.lastElementChild;
-            inner.innerHTML=adjustedName;
-        }
-    })
-}
-
-
-// let fetchSeriesList=()=>fetch(`${url}tag.json?limit=0&type=3`).then(response=>response.ok?response.json():null)
-// let fetchFromTag=(tag)=>fetch(`${url}post.json?tags=${tag}`).then(response=>response.ok?response.json():null)
-
-
-
+//gets a random series title
 let resolveAnswer=async (sList)=>{
        
     let answerPromise = new Promise(resolve=>{
@@ -123,6 +94,8 @@ let resolveAnswer=async (sList)=>{
     return answerPromise;    
 }
 
+
+//takes a tag, then runs validation on it for various criteria, sending back a valid post
 let resolveProperAnswer = async (tag) =>{
     let currentSeries = await bypassCors(`${url}post.json?tags=${tag}`)
     let correctAnswerPromise = new Promise (resolve=>{
@@ -139,37 +112,6 @@ let resolveProperAnswer = async (tag) =>{
     })
     return correctAnswerPromise;
 }
-
-
-let resolveVideoContent=(source)=>{
-    return new Promise(resolve=>{
-        let validLink=null;
-        
-        fetchFromTag(source).then(content=>{
-            let correctVideo=validateVideoContent(content);
-            correctVideo?validLink=true:validLink=false;
-            if(validLink){
-                console.log('Got a Video!')
-                resolve(correctVideo.file_url)
-            }else{
-                console.log('Getting a new video...')
-                resolve(resolveVideoContent(source))
-            }
-        })
-    })
-}
-
-
-//takes a video link and checks if it's a video
-let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
-
-
-//checks the item to see if it's an anime or not based on the tags
-let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
-
-
-//checks for content
-let isSafe=(temp)=>temp.rating=='s';
 
 
 //function that gets a random video link
@@ -199,6 +141,43 @@ validateVideoContent=(promiseResults)=>{
         return false;
     }
 }
+
+
+let fillOutAnswers=(source, answer)=>{
+    //pick a random answer number to be the correct one
+    correctIndex=getRand(4);
+    let inner;
+    let adjustedName;
+
+    //fills in the answers on the page
+    answers.forEach(choice=>{
+        //fills in correct answer
+        if(answers.indexOf(choice)==correctIndex){
+            inner=choice.lastElementChild;
+            adjustedName=humanize(answer);
+            inner.innerHTML=adjustedName;
+            return correctIndex;
+        }
+        //fills in other answers
+        else{    
+            adjustedName=humanize(getRandomTitle(source))       
+            inner=choice.lastElementChild;
+            inner.innerHTML=adjustedName;
+        }
+    })
+}
+
+
+//takes a video link and checks if it's a video
+let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
+
+
+//checks the item to see if it's an anime or not based on the tags
+let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
+
+
+//checks for content
+let isSafe=(temp)=>temp.rating=='s';
 
 
 let resolveScore=()=>{
@@ -235,11 +214,11 @@ let resolveScore=()=>{
     }
 }
 
+
+//runs through potential answers until a valid one is found
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
-    console.log("ANSWER", answer);
     let correctAnswer=await resolveProperAnswer(answer);
-    console.log("FILTERED ANSWER",correctAnswer);
     correctAnswer?null:await filterAnswers();
     return {
         title:answer,
@@ -247,11 +226,11 @@ async function filterAnswers(SL){
     }
 }
 
+
 async function buildGame(){
+
     let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
-    //gets an appropriate series and video
     let filteredAnswer=await filterAnswers(seriesList);
-    console.log(filteredAnswer.title);
     
     let videoContent = await filteredAnswer.choice.file_url
     
@@ -291,5 +270,7 @@ async function buildGame(){
         }
     })
 }
+
+
 
 buildGame();
