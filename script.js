@@ -2,7 +2,6 @@
 let sakugaWindow=document.createElement('div');
 document.body.appendChild(sakugaWindow);
 
-
 let videoPlayer=document.querySelector('video');
 
 let form=document.querySelector('form');
@@ -15,6 +14,32 @@ let correctIndex;
 let correctAnime;
 
 let url='https://www.sakugabooru.com/'
+
+async function bypassCors(link){
+    console.log('trying cors unblocking...')
+    const Aurl = 'https://cors-proxy3.p.rapidapi.com/api';
+    const options = {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
+            'X-RapidAPI-Host': 'cors-proxy3.p.rapidapi.com'
+        },
+        body: new URLSearchParams({
+            'my-url': link
+        })
+    };
+
+    try {
+        const response = await fetch(Aurl, options);
+        const result = await response.text();
+        console.log(result)
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 
 let wait=0;
 let score=2;
@@ -126,6 +151,11 @@ let fillOutAnswers=(source, answer)=>{
 let fetchSeriesList=()=>fetch(`${url}tag.json?limit=0&type=3`).then(response=>response.ok?response.json():null)
 let fetchFromTag=(tag)=>fetch(`${url}post.json?tags=${tag}`).then(response=>response.ok?response.json():null)
 
+async function fetchSeriesListCORS(){
+    let currentPost=await bypassCors('https://www.sakugabooru.com/post.json?limit=1');
+    console.log(currentPost);
+}
+
 
 let resolveProperAnswer=()=>{
     let answerPromise = new Promise(resolve=>{
@@ -209,6 +239,7 @@ let resolveScore=()=>{
 
 async function buildGame(){
     //gets an appropriate series and video
+
     let answerContent = await resolveProperAnswer();
     let videoContent= await resolveVideoContent(answerContent)
     
