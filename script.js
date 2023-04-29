@@ -24,7 +24,7 @@ let wordsRight=0;
 let scoreJSON=localStorage.getItem('scoreItem');
 
 let scoreItem=JSON.parse(scoreJSON);
-scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
+scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0, numQuestions: 0};
 
 let currentScoreDisplay=document.getElementById('current-score');
 currentScoreDisplay.innerHTML+=scoreItem.score;
@@ -220,6 +220,8 @@ let fillOutAnswers=(source, answer)=>{
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
     if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
+        scoreItem.numQuestions++;
+
         result.innerHTML==('XXX')?miss=1:null;
         if(multipleChoiceStage){
             let correctListItem=answers[correctIndex];
@@ -236,12 +238,15 @@ let resolveScore=()=>{
             console.log(`Your score for this round: ${scoreItem.score}`);
             if(scoreItem.score>scoreItem.topScore){
                 scoreItem.topScore=scoreItem.score;
-                result.innerHTML='New High Score!';
+                result.innerHTML='New High Score!<break>';
             }
             console.log(`Your high score:           ${scoreItem.topScore}`)
+            result.innerHTML+=`NUMBER OF QUESTIONS: ${scoreItem.numQuestions}
+            <break>AVERAGE SCORE PER QUESTION: ${(scoreItem.score/scoreItem.numQuestions)}`
             scoreItem.score=0;
             scoreItem.misses=0;
-            wait=3500;
+            scoreItem.numQuestions=0;
+            wait=4500;
         }else{console.log(`Current Score: ${scoreItem.score}`);}
         
         scoreJSON=JSON.stringify(scoreItem);
