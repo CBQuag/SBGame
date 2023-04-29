@@ -103,7 +103,6 @@ let resolveProperAnswer = async (tag) =>{
         correctAnswer?validLink=true:validLink=false;
         if(validLink){
             console.log('Got an answer!')
-            console.log("CORRECT ANSWER RESOLVE", correctAnswer)
             resolve(correctAnswer)
         }else{
             console.log('Getting a new result...')
@@ -133,14 +132,12 @@ validateVideoContent=(promiseResults)=>{
     //filters out any items that don't have video links
     promiseResults.forEach(p=>linkList.push(p));
     linkList=linkList.filter(links=>isVideo(links.file_url));
-    console.log(linkList)
 
     if(linkList.length>0){
         let tempVid=linkList[getRand(linkList.length)];
         if(isAnime(tempVid)){
             console.log("Validating content type...");
             if(isSafe(tempVid)){
-                console.log("TEMP VID: ",tempVid)
                 return tempVid;
             }else{
                 console.log('Not safe for work.')
@@ -242,7 +239,6 @@ let resolveScore=()=>{
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
     let correctAnswer=await resolveProperAnswer(answer);
-    console.log("CORRECT ANSWER FILTER", correctAnswer)
     if(correctAnswer){
         return {
             title:answer,
@@ -259,10 +255,8 @@ async function buildGame(){
     let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
 
     let filteredAnswer=await filterAnswers(seriesList);
-    console.log("FILTERED ANSWER: ",filteredAnswer)
     
     let videoContent = await filteredAnswer.choice.file_url
-    console.log("VIDEO CONTENT: ",videoContent)
 
     //fills out answers and displays video
     fillOutAnswers(seriesList,filteredAnswer.title)
