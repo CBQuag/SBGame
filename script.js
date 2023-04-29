@@ -19,12 +19,13 @@ let url='https://www.sakugabooru.com/'
 let wait=0;
 let score=3;
 let miss=0;
+let wordsRight=0;
 
 let scoreJSON=localStorage.getItem('scoreItem');
-let seriesListJSON=localStorage.getItem('seriesListJ');
+// let seriesListJSON=localStorage.getItem('seriesListJ');
 
 let scoreItem=JSON.parse(scoreJSON);
-let seriesListJ=JSON.parse(seriesListJSON);
+// let seriesListJ=JSON.parse(seriesListJSON);
 scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
 
 let currentScoreDisplay=document.getElementById('current-score');
@@ -271,7 +272,27 @@ async function filterAnswers(SL){
 
 
 let verifyOrContinue=(inp,ans,list,ans2)=>{
-    if(inp.value.toLowerCase() == ans.toLowerCase()){
+    let inpArr=inp.value.toLowerCase().split(' ')
+    let ansArr=ans.toLowerCase().split(' ')
+    let isClose=false;
+    for(let i in inpArr){
+        ansArr.includes(inpArr[i])?wordsRight++:null;
+    }
+    if(ansArr.length==1){
+        if(wordsRight>0){
+            isClose=true;
+        }
+    }else{
+        if(wordsRight>1){
+            isClose=true;
+        }
+    }
+    if(ansArr.length>2){
+        if(wordsRight==ansArr.length){
+            score+=2;
+        }
+    }
+    if(isClose){
         result.innerHTML='Correct!';
     }else{
         result.innerHTML+='X';
@@ -291,8 +312,8 @@ let generateSuggestionBox=(source, sourceA)=>{
     })
     anime.sort();
 
-    seriesListJSON=JSON.stringify(anime);
-    localStorage.setItem('seriesListJ',seriesListJSON);
+    // seriesListJSON=JSON.stringify(anime);
+    // localStorage.setItem('seriesListJ',seriesListJSON);
 
     let input = document.getElementById("input");
     input.focus();
