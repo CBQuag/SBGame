@@ -1,7 +1,10 @@
+let multipleChoiceStage=false;
 
 let videoPlayer=document.querySelector('#video-box');
 
-let answerBox=document.querySelector('#inner-answer-box')
+let legend=document.querySelector('legend');
+let answerBox=document.querySelector('#inner-answer-box');
+let submitButton=document.getElementById('submit-button')
 
 let form=document.querySelector('form');
 
@@ -14,7 +17,7 @@ let correctAnime;
 let url='https://www.sakugabooru.com/'
 
 let wait=0;
-let score=2;
+let score=3;
 let miss=0;
 
 let scoreJSON=localStorage.getItem('scoreItem');
@@ -26,6 +29,8 @@ currentScoreDisplay.innerHTML+=scoreItem.score;
 let highScoreDisplay=document.getElementById('high-score');
 highScoreDisplay.innerHTML+=scoreItem.topScore;
 let triesLeft=document.getElementById('tries-left');
+
+
 
 //draws x's for strikes
 triesLeft.innerHTML=''
@@ -165,7 +170,7 @@ validateVideoContent=(promiseResults)=>{
 
 
 let fillOutAnswers=(source, answer)=>{
-
+    legend.innerHTML=`SELECT A TITLE`
     answerBox.innerHTML=`<ul>
     <li>
         <input type="radio" id="first"  value="0"   name="answer">
@@ -212,10 +217,12 @@ let fillOutAnswers=(source, answer)=>{
 
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
-    if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
-        result.innerHTML==('XX')?miss=1:null;
-        let correctListItem=answers[correctIndex];
-        correctListItem.setAttribute('class','correctLi')
+    if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
+        result.innerHTML==('XXX')?miss=1:null;
+        if(multipleChoiceStage){
+            let correctListItem=answers[correctIndex];
+            correctListItem.setAttribute('class','correctLi')
+        }
 
         scoreItem.score+=score;
         scoreItem.misses+=miss;
@@ -260,16 +267,115 @@ async function filterAnswers(SL){
 }
 
 
+let verifyOrContinue=(inp,ans,list,ans2)=>{
+    if(inp.value.toLowerCase() == ans.toLowerCase()){
+        result.innerHTML='Correct!';
+    }else{
+        result.innerHTML+='X';
+        multipleChoiceStage=true;
+        fillOutAnswers(list,ans2)
+    }
+}
+
+let generateSuggestionBox=(source, sourceA)=>{
+    let answer=humanize(sourceA)
+
+    let words = [];
+    source.forEach(n=>{
+        words.push(humanize(n.name))
+    })
+    words.sort();
+    let input = document.getElementById("input");
+    input.focus();
+    let suggestion = document.getElementById("suggestion");
+    //Enter key code
+    const enterKey = 13;
+    const rightArrow=39;
+    
+    window.onload = () => {
+        input.value = "";
+        clearSuggestion();
+    };
+    
+    const clearSuggestion = () => {
+        suggestion.innerHTML = "";
+    };
+    
+    const caseCheck = (word) => {
+    //Array of characters
+    word = word.split("");
+    let inp = input.value;
+    //loop through every character in ino
+    for (let i in inp) {
+        //if input character matches with character in word no need to change
+        if (inp[i] == word[i]) {
+            continue;
+        } else if (inp[i].toUpperCase() == word[i]) {
+            //if inp[i] when converted to uppercase matches word[i] it means word[i] needs to be lowercase
+            word.splice(i, 1, word[i].toLowerCase());
+        } else {
+            //word[i] needs to be uppercase
+            word.splice(i, 1, word[i].toUpperCase());
+        }
+        }
+        //array to string
+        return word.join("");
+    };
+    
+    //Execute function on input
+    input.addEventListener("input", (e) => {
+    clearSuggestion();
+    //Convert input value to regex since string.startsWith() is case sensitive
+    let regex = new RegExp("^" + input.value, "i");
+        //loop through words array
+        for (let i in words) {
+            //check if input matches with any word in words array
+            if (regex.test(words[i]) && input.value != "") {
+                //Change case of word in words array according to user input
+                words[i] = caseCheck(words[i]);
+                //display suggestion
+                suggestion.innerHTML = words[i];
+                break;
+            }
+        }
+    });
+    
+    //Complete predictive text on enter key
+    input.addEventListener("keydown", (e) => {
+    //When user presses enter and suggestion exists
+        if (e.keyCode == rightArrow && suggestion.innerText != "") {
+            e.preventDefault();
+            input.value = suggestion.innerText;
+            //clear the suggestion
+            clearSuggestion();
+        }else if (e.keyCode == enterKey) {
+            e.preventDefault();
+            clearSuggestion();   
+            verifyOrContinue(input,answer,source,sourceA);
+            resolveScore()
+            //clear the suggestion
+                  
+        }
+    });
+
+    submitButton.addEventListener('click',(e)=>{
+        e.preventDefault();
+        verifyOrContinue(input,answer,source,sourceA);
+        resolveScore()
+    },{once:true})
+}
+
+
 async function buildGame(){
 
     let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
 
     let filteredAnswer=await filterAnswers(seriesList);
+
+    generateSuggestionBox(seriesList, filteredAnswer.title);
     
     let videoContent = await filteredAnswer.choice.file_url
 
-    //fills out answers and displays video
-    fillOutAnswers(seriesList,filteredAnswer.title)
     videoPlayer.innerHTML=`<video width="100%" loop muted autoplay src="${videoContent}"></video>`
     console.log(`${humanize(filteredAnswer.title)} is the answer`);
     
@@ -287,9 +393,11 @@ async function buildGame(){
         resolveScore()
     })
 
+
     //checks if the submitted answer is right
     form.addEventListener('submit',(e)=>{
         e.preventDefault()
+        console.log('clicked multiple')
         const data= new FormData(form);
         for(const entry of data){
             if(entry[1]==correctIndex){
