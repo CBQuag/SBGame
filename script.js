@@ -103,6 +103,7 @@ let resolveProperAnswer = async (tag) =>{
         correctAnswer?validLink=true:validLink=false;
         if(validLink){
             console.log('Got an answer!')
+            console.log("CORRECT ANSWER RESOLVE", correctAnswer)
             resolve(correctAnswer)
         }else{
             console.log('Getting a new result...')
@@ -113,6 +114,18 @@ let resolveProperAnswer = async (tag) =>{
 }
 
 
+//takes a video link and checks if it's a video
+let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
+
+
+//checks the item to see if it's an anime or not based on the tags
+let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
+
+
+//checks for content
+let isSafe=(temp)=>temp.rating=='s';
+
+
 //function that gets a random video link
 validateVideoContent=(promiseResults)=>{
     let linkList=[];
@@ -120,12 +133,14 @@ validateVideoContent=(promiseResults)=>{
     //filters out any items that don't have video links
     promiseResults.forEach(p=>linkList.push(p));
     linkList=linkList.filter(links=>isVideo(links.file_url));
+    console.log(linkList)
 
     if(linkList.length>0){
         let tempVid=linkList[getRand(linkList.length)];
         if(isAnime(tempVid)){
             console.log("Validating content type...");
             if(isSafe(tempVid)){
+                console.log("TEMP VID: ",tempVid)
                 return tempVid;
             }else{
                 console.log('Not safe for work.')
@@ -188,18 +203,6 @@ let fillOutAnswers=(source, answer)=>{
 }
 
 
-//takes a video link and checks if it's a video
-let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
-
-
-//checks the item to see if it's an anime or not based on the tags
-let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
-
-
-//checks for content
-let isSafe=(temp)=>temp.rating=='s';
-
-
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
     if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
@@ -239,10 +242,14 @@ let resolveScore=()=>{
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
     let correctAnswer=await resolveProperAnswer(answer);
-    correctAnswer?null:await filterAnswers(SL);
-    return {
-        title:answer,
-        choice:correctAnswer
+    console.log("CORRECT ANSWER FILTER", correctAnswer)
+    if(correctAnswer){
+        return {
+            title:answer,
+            choice:correctAnswer
+        }
+    }else{
+        return await filterAnswers(SL);
     }
 }
 
@@ -252,9 +259,11 @@ async function buildGame(){
     let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
 
     let filteredAnswer=await filterAnswers(seriesList);
+    console.log("FILTERED ANSWER: ",filteredAnswer)
     
     let videoContent = await filteredAnswer.choice.file_url
-    
+    console.log("VIDEO CONTENT: ",videoContent)
+
     //fills out answers and displays video
     fillOutAnswers(seriesList,filteredAnswer.title)
     videoPlayer.setAttribute('src', `${videoContent}`);
