@@ -21,7 +21,10 @@ let score=3;
 let miss=0;
 
 let scoreJSON=localStorage.getItem('scoreItem');
+let seriesListJSON=localStorage.getItem('seriesListJ');
+
 let scoreItem=JSON.parse(scoreJSON);
+let seriesListJ=JSON.parse(seriesListJSON);
 scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
 
 let currentScoreDisplay=document.getElementById('current-score');
@@ -272,35 +275,34 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         result.innerHTML='Correct!';
     }else{
         result.innerHTML+='X';
+        score-=1;
         multipleChoiceStage=true;
         fillOutAnswers(list,ans2)
     }
 }
 
+
 let generateSuggestionBox=(source, sourceA)=>{
     let answer=humanize(sourceA)
 
-    let words = [];
+    let anime = [];
     source.forEach(n=>{
-        words.push(humanize(n.name))
+        anime.push(humanize(n.name))
     })
-    words.sort();
+    anime.sort();
+
+    seriesListJSON=JSON.stringify(anime);
+    localStorage.setItem('seriesListJ',seriesListJSON);
+
     let input = document.getElementById("input");
     input.focus();
     let suggestion = document.getElementById("suggestion");
-    //Enter key code
     const enterKey = 13;
     const rightArrow=39;
-    
     window.onload = () => {
         input.value = "";
-        clearSuggestion();
-    };
-    
-    const clearSuggestion = () => {
         suggestion.innerHTML = "";
-    };
-    
+    };       
     const caseCheck = (word) => {
     //Array of characters
     word = word.split("");
@@ -324,17 +326,17 @@ let generateSuggestionBox=(source, sourceA)=>{
     
     //Execute function on input
     input.addEventListener("input", (e) => {
-    clearSuggestion();
+    suggestion.innerHTML = "";
     //Convert input value to regex since string.startsWith() is case sensitive
     let regex = new RegExp("^" + input.value, "i");
         //loop through words array
-        for (let i in words) {
+        for (let i in anime) {
             //check if input matches with any word in words array
-            if (regex.test(words[i]) && input.value != "") {
+            if (regex.test(anime[i]) && input.value != "") {
                 //Change case of word in words array according to user input
-                words[i] = caseCheck(words[i]);
+                anime[i] = caseCheck(anime[i]);
                 //display suggestion
-                suggestion.innerHTML = words[i];
+                suggestion.innerHTML = anime[i];
                 break;
             }
         }
@@ -346,15 +348,12 @@ let generateSuggestionBox=(source, sourceA)=>{
         if (e.keyCode == rightArrow && suggestion.innerText != "") {
             e.preventDefault();
             input.value = suggestion.innerText;
-            //clear the suggestion
-            clearSuggestion();
+            suggestion.innerHTML = "";            
         }else if (e.keyCode == enterKey) {
             e.preventDefault();
-            clearSuggestion();   
+            suggestion.innerHTML = "";  
             verifyOrContinue(input,answer,source,sourceA);
-            resolveScore()
-            //clear the suggestion
-                  
+            resolveScore()                  
         }
     });
 
