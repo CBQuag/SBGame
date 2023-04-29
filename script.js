@@ -317,12 +317,6 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
     }
 }
 
-let firstClick=(e)=>{
-    e.preventDefault();
-    verifyOrContinue(input,answer,source,sourceA);
-    resolveScore();
-}
-
 let generateSuggestionBox=(source, sourceA)=>{
     let answer=humanize(sourceA)
 
