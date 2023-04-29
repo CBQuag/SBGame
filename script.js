@@ -77,9 +77,15 @@ humanize=(str)=>{
 //gets random titles from the source
 let getRandomTitle=(source)=>{
     let showName=source[getRand(source.length)].name
-    if(showName.slice((showName.length)-2)==`mv`){
+    if(showName.slice((showName.length)-4)==`(mv)`){
+        console.log("Filtering music video...")
         getRandomTitle(source);
     }
+    else if((showName.slice((showName.length)-12).toLowerCase()==`(video game)`)){
+        console.log("Filtering video game...")
+        getRandomTitle(source);
+    }
+    
     return source[getRand(source.length)].name
 };
 
