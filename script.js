@@ -22,10 +22,8 @@ let miss=0;
 let wordsRight=0;
 
 let scoreJSON=localStorage.getItem('scoreItem');
-// let seriesListJSON=localStorage.getItem('seriesListJ');
 
 let scoreItem=JSON.parse(scoreJSON);
-// let seriesListJ=JSON.parse(seriesListJSON);
 scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0};
 
 let currentScoreDisplay=document.getElementById('current-score');
@@ -86,13 +84,13 @@ humanize=(str)=>{
 //gets random titles from the source
 let getRandomTitle=(source)=>{
     let showName=source[getRand(source.length)].name
-    if(showName.slice((showName.length)-4)==`(mv)`){
+    if((showName.slice((showName.length)-4)==`(mv)`)||showName.slice((showName.length)-4)==`(cm)`){
         console.log("Filtering music video...")
-        getRandomTitle(source);
+        return getRandomTitle(source);
     }
     else if((showName.slice((showName.length)-12).toLowerCase()==`(video game)`)){
         console.log("Filtering video game...")
-        getRandomTitle(source);
+        return getRandomTitle(source);
     }
     
     return source[getRand(source.length)].name
@@ -272,36 +270,58 @@ async function filterAnswers(SL){
 
 
 let verifyOrContinue=(inp,ans,list,ans2)=>{
-    let inpArr=inp.value.toLowerCase().split(' ')
-    let ansArr=ans.toLowerCase().split(' ')
-    let isClose=false;
-    for(let i in inpArr){
-        ansArr.includes(inpArr[i])?wordsRight++:null;
-    }
-    if(ansArr.length==1){
-        if(wordsRight>0){
-            isClose=true;
+    if(multipleChoiceStage){
+        console.log('clicked multiple')
+        const data= new FormData(form);
+        for(const entry of data){
+            if(entry[1]==correctIndex){
+                result.innerHTML='Correct!';
+            }else{
+                result.innerHTML+='X';
+                score-=1;
+            }
+            resolveScore()
         }
     }else{
-        if(wordsRight>1){
-            isClose=true;
+        let inpArr=inp.value.toLowerCase().split(' ')
+        let ansArr=ans.toLowerCase().split(' ')
+        let isClose=false;
+        for(let i in ansArr){
+            i=i.replace(/[!@#$%^&:.*]/g, "")
         }
-    }
-    if(ansArr.length>2){
-        if(wordsRight==ansArr.length){
-            score+=2;
+        for(let i in inpArr){
+            ansArr.includes(inpArr[i].replace(/[!@#$%^&:.*]/g, ""))?wordsRight++:null;
         }
-    }
-    if(isClose){
-        result.innerHTML='Correct!';
-    }else{
-        result.innerHTML+='X';
-        score-=1;
-        multipleChoiceStage=true;
-        fillOutAnswers(list,ans2)
+        if(ansArr.length==1){
+            if(wordsRight>0){
+                isClose=true;
+            }
+        }else{
+            if(wordsRight>0){
+                isClose=true;
+            }
+        }
+        if(ansArr.length>2){
+            if(wordsRight==ansArr.length){
+                score+=2;
+            }
+        }
+        if(isClose){
+            result.innerHTML='Correct!';
+        }else{
+            result.innerHTML+='X';
+            score-=1;
+            fillOutAnswers(list,ans2)
+            multipleChoiceStage=true;
+        }
     }
 }
 
+let firstClick=(e)=>{
+    e.preventDefault();
+    verifyOrContinue(input,answer,source,sourceA);
+    resolveScore();
+}
 
 let generateSuggestionBox=(source, sourceA)=>{
     let answer=humanize(sourceA)
@@ -311,9 +331,6 @@ let generateSuggestionBox=(source, sourceA)=>{
         anime.push(humanize(n.name))
     })
     anime.sort();
-
-    // seriesListJSON=JSON.stringify(anime);
-    // localStorage.setItem('seriesListJ',seriesListJSON);
 
     let input = document.getElementById("input");
     input.focus();
@@ -382,7 +399,7 @@ let generateSuggestionBox=(source, sourceA)=>{
         e.preventDefault();
         verifyOrContinue(input,answer,source,sourceA);
         resolveScore()
-    },{once:true})
+    })
 }
 
 
@@ -417,17 +434,7 @@ async function buildGame(){
     //checks if the submitted answer is right
     form.addEventListener('submit',(e)=>{
         e.preventDefault()
-        console.log('clicked multiple')
-        const data= new FormData(form);
-        for(const entry of data){
-            if(entry[1]==correctIndex){
-                result.innerHTML='Correct!';
-            }else{
-                result.innerHTML+='X';
-                score-=1;
-            }
-            resolveScore()
-        }
+        verifyOrContinue()
     })
 }
 
