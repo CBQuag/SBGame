@@ -41,7 +41,7 @@ async function bypassCors(link){
         method: 'POST',
         headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            // 'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
+            'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
             'X-RapidAPI-Host': 'cors-proxy3.p.rapidapi.com'
         },
         body: new URLSearchParams({
@@ -76,6 +76,10 @@ humanize=(str)=>{
 
 //gets random titles from the source
 let getRandomTitle=(source)=>{
+    let showName=source[getRand(source.length)].name
+    if(showName.slice((showName.length)-2)==`mv`){
+        getRandomTitle(source);
+    }
     return source[getRand(source.length)].name
 };
 
