@@ -287,10 +287,10 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         let ansArr=ans.toLowerCase().split(' ')
         let isClose=false;
         for(let i in ansArr){
-            i=i.replace(/[!@#$%^&:.*]/g, "")
+            ansArr[i]=ansArr[i].replace(/[!@#$%^&:.'?*]/g, "")
         }
         for(let i in inpArr){
-            ansArr.includes(inpArr[i].replace(/[!@#$%^&:.*]/g, ""))?wordsRight++:null;
+            ansArr.includes(inpArr[i].replace(/[!@#$%^&:.1?*]/g, ""))?wordsRight++:null;
         }
         if(ansArr.length==1){
             if(wordsRight>0){
@@ -302,7 +302,7 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
             }
         }
         if(ansArr.length>2){
-            if(wordsRight==ansArr.length){
+            if(inp.value.toLowerCase()==ans.toLowerCase()){
                 score+=2;
             }
         }
