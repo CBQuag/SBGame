@@ -1,5 +1,5 @@
 
-let videoPlayer=document.querySelector('video');
+let videoPlayer=document.querySelector('#video-box');
 
 let answerBox=document.querySelector('#inner-answer-box')
 
@@ -41,7 +41,7 @@ async function bypassCors(link){
         method: 'POST',
         headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
+            // 'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
             'X-RapidAPI-Host': 'cors-proxy3.p.rapidapi.com'
         },
         body: new URLSearchParams({
@@ -260,7 +260,7 @@ async function buildGame(){
 
     //fills out answers and displays video
     fillOutAnswers(seriesList,filteredAnswer.title)
-    videoPlayer.setAttribute('src', `${videoContent}`);
+    videoPlayer.innerHTML=`<video width="100%" loop muted autoplay src="${videoContent}"></video>`
     console.log(`${humanize(filteredAnswer.title)} is the answer`);
     
     //checks if the keypress matches the correct answer
