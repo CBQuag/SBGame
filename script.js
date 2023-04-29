@@ -1,11 +1,9 @@
 
-let sakugaWindow=document.createElement('div');
-document.body.appendChild(sakugaWindow);
-
 let videoPlayer=document.querySelector('video');
 
+let answerBox=document.querySelector('#inner-answer-box')
+
 let form=document.querySelector('form');
-let answers=Array.from(document.querySelectorAll('li'));
 
 let result=document.querySelector('#results');
 result.innerHTML='';
@@ -43,7 +41,7 @@ async function bypassCors(link){
         method: 'POST',
         headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            'X-RapidAPI-Key': '3fb322ff20mshe3a2b6a9e4e427ep100c0cjsna68471747f6d',
+            'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
             'X-RapidAPI-Host': 'cors-proxy3.p.rapidapi.com'
         },
         body: new URLSearchParams({
@@ -56,6 +54,7 @@ async function bypassCors(link){
         const result = await response.json();
         return result;
     } catch (error) {
+        answerBox.innerHTML="CORS Blocking Error";
         console.error(error);
     }
 }
@@ -144,6 +143,27 @@ validateVideoContent=(promiseResults)=>{
 
 
 let fillOutAnswers=(source, answer)=>{
+
+    answerBox.innerHTML=`<ul>
+    <li>
+        <input type="radio" id="first"  value="0"   name="answer">
+        <label for="first">Waiting...</label>
+    </li>
+    <li>
+        <input type="radio" id="second" value="1"   name="answer">
+        <label for="second">Waiting...</label>
+    <li>
+        <input type="radio" id="third"  value="2"   name="answer">
+        <label for="third">Waiting...</label>
+    </li>
+    <li>
+        <input type="radio" id="fourth" value="3"   name="answer">
+        <label for="fourth">Waiting...</label>
+    </li>
+</ul>`;
+
+    let answers=Array.from(document.querySelectorAll('li'));
+
     //pick a random answer number to be the correct one
     correctIndex=getRand(4);
     let inner;
@@ -181,12 +201,12 @@ let isSafe=(temp)=>temp.rating=='s';
 
 
 let resolveScore=()=>{
+    let answers=Array.from(document.querySelectorAll('li'));
     if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
         result.innerHTML==('XX')?miss=1:null;
         let correctListItem=answers[correctIndex];
         correctListItem.setAttribute('class','correctLi')
 
-        
         scoreItem.score+=score;
         scoreItem.misses+=miss;
 
@@ -219,7 +239,7 @@ let resolveScore=()=>{
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
     let correctAnswer=await resolveProperAnswer(answer);
-    correctAnswer?null:await filterAnswers();
+    correctAnswer?null:await filterAnswers(SL);
     return {
         title:answer,
         choice:correctAnswer
@@ -230,6 +250,7 @@ async function filterAnswers(SL){
 async function buildGame(){
 
     let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
+
     let filteredAnswer=await filterAnswers(seriesList);
     
     let videoContent = await filteredAnswer.choice.file_url
@@ -250,7 +271,6 @@ async function buildGame(){
                 score-=1;
             }
         }
-
         resolveScore()
     })
 
@@ -265,12 +285,10 @@ async function buildGame(){
                 result.innerHTML+='X';
                 score-=1;
             }
-
             resolveScore()
         }
     })
 }
-
 
 
 buildGame();
