@@ -66,10 +66,9 @@ ul{
     display: flex;
     justify-content: end;
 }
-#results-box{
+#results-box,#correct-name{
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
 }
 .correctLi{
     background-color: rgb(204, 0, 0);

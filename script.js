@@ -4,15 +4,16 @@ let videoPlayer=document.querySelector('#video-box');
 
 let legend=document.querySelector('legend');
 let answerBox=document.querySelector('#inner-answer-box');
-let submitButton=document.getElementById('submit-button')
+let submitButton=document.getElementById('submit-button');
 
 
 let form=document.querySelector('form');
 
 let result=document.querySelector('#results-box');
+let fullNameDisplay=document.getElementById('correct-name')
 
 let resetButton=document.getElementById('reset-button');
-let restartButton=document.getElementById('restart-button')
+let restartButton=document.getElementById('restart-button');
 result.innerHTML='';
 
 let correctIndex;
@@ -181,7 +182,9 @@ let resolveProperAnswer = async (tag) =>{
 //then sends the points to the total
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
-    if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
+    if(result.innerHTML==('Correct!')
+    ||result.innerHTML==('XX')
+    ||result.innerHTML==('Perfect!')){
         scoreItem.numQuestions++;
 
         result.innerHTML==('XX')?miss=1:null;
@@ -392,14 +395,15 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         if(wordsRight>0){
             isClose=true;
         }
-        if(ansArr.length>2){
-            if(inp.value.toLowerCase()==ans.toLowerCase()){
-                score+=1;
-            }
-        }
         if(isClose){
             result.innerHTML='Correct!';
             scoreItem.numEntries++;
+            if(inp.value.toLowerCase()==ans.toLowerCase()){
+                score+=1;
+                result.innerHTML='Perfect!';
+            }else{
+                fullNameDisplay.innerHTML+=`<p style='font-size: 20px;margin-top:10px'>${ans}</p>`
+            }
             
         }else{
             result.innerHTML+='X';
