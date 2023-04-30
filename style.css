@@ -28,6 +28,10 @@ video{
 div>h4{
     margin-bottom: 8px;
 }
+div>p{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
 
 #current-score,#high-score,#tries-left{
     color: rgb(204, 0, 0);
