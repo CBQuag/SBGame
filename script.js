@@ -21,7 +21,7 @@ let correctAnime;
 let url='https%3A%2F%2Fwww.sakugabooru.com%2F'
 
 let wait=0;
-let score=3;
+let score=2;
 let miss=0;
 let wordsRight=0;
 
@@ -394,7 +394,7 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         }
         if(ansArr.length>2){
             if(inp.value.toLowerCase()==ans.toLowerCase()){
-                score+=2;
+                score+=1;
             }
         }
         if(isClose){
