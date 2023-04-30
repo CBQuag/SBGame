@@ -31,5 +31,4 @@ At the end, score is shown and added to a leaderboard
     Maybe with a review of answers
 
 
-PLANS
-
+HOW IT OPERATES NOW:

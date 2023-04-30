@@ -24,10 +24,16 @@ video{
     margin:auto;
     max-width: 600px;
 }
+
+div>h4{
+    margin-bottom: 8px;
+}
+
 #current-score,#high-score,#tries-left{
     color: rgb(204, 0, 0);
     display: flex;
     justify-content: center;
+    margin-top: 0px;
 }
 #answer-box{
     width: 80%;
@@ -124,7 +130,7 @@ ul{
 
   .input-container {
     position: relative;
-    width: 25em;
+    max-width: 80%;
     height: 4.4em;
     border-radius: 5px;
   }
@@ -134,7 +140,7 @@ ul{
     border: none;
     background-color: transparent;
     position: absolute;
-    width: inherit;
+    max-width: 100%;
     height: inherit;
     color:white;
     font-size: 25px;
