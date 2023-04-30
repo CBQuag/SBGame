@@ -7,6 +7,15 @@ button{
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
 }
+
+#reset-button-box{
+    display: flex;
+    justify-content: end;
+}
+#reset-button{
+    background: none;
+    border: none;
+}
 h1{
     padding-left: 5%;
 }

@@ -9,6 +9,8 @@ let submitButton=document.getElementById('submit-button')
 let form=document.querySelector('form');
 
 let result=document.querySelector('#results-box');
+
+let resetButton=document.getElementById('reset-button');
 result.innerHTML='';
 
 let correctIndex;
@@ -349,6 +351,18 @@ async function filterAnswers(SL){
 //provides functionality to the submit button to check inputs over multiple 
 //stages of the game, and adjusts the score awarded
 let verifyOrContinue=(inp,ans,list,ans2)=>{
+    document.addEventListener('keypress', (e)=>{
+        let keyIndex=e.code.slice(e.code.length-1)
+        if((keyIndex>0)&&(keyIndex<=4)){
+            if(keyIndex==correctIndex+1){
+                result.innerHTML='Correct!';
+            }else{
+                result.innerHTML+='X';
+                score-=1;
+            }
+        }
+        resolveScore()
+    })
     if(multipleChoiceStage){
         console.log('clicked multiple')
         const data= new FormData(form);
@@ -409,20 +423,10 @@ async function buildGame(){
     videoPlayer.innerHTML=`<video width="100%" loop muted autoplay src="${videoContent}"></video>`
     console.log(`${humanize(filteredAnswer.title)} is the answer`);
     
-    //checks if the keypress matches the correct answer
-    document.addEventListener('keypress', (e)=>{
-        let keyIndex=e.code.slice(e.code.length-1)
-        if((keyIndex>0)&&(keyIndex<=4)){
-            if(keyIndex==correctIndex+1){
-                result.innerHTML='Correct!';
-            }else{
-                result.innerHTML+='X';
-                score-=1;
-            }
-        }
-        resolveScore()
+    resetButton.addEventListener('click',(e)=>{
+        localStorage.clear();
+        window.location.reload();
     })
-
 }
 
 
