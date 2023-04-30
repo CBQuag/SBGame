@@ -8,13 +8,11 @@ let submitButton=document.getElementById('submit-button')
 
 let form=document.querySelector('form');
 
-let result=document.querySelector('#results');
+let result=document.querySelector('#results-box');
 result.innerHTML='';
 
 let correctIndex;
 let correctAnime;
-
-// https%3A%2F%2Fwww.sakugabooru.com%2Ftag.json%3Flimit%3D0%26type%3D3
 
 let url='https%3A%2F%2Fwww.sakugabooru.com%2F'
 
@@ -26,7 +24,7 @@ let wordsRight=0;
 let scoreJSON=localStorage.getItem('scoreItem');
 
 let scoreItem=JSON.parse(scoreJSON);
-scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0, numQuestions: 0};
+scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0, numQuestions: 0, numEntries: 0};
 
 let currentScoreDisplay=document.getElementById('current-score');
 currentScoreDisplay.innerHTML+=scoreItem.score;
@@ -175,6 +173,7 @@ let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
     if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
         scoreItem.numQuestions++;
+        console.log(scoreItem.numQuestions);
 
         result.innerHTML==('XXX')?miss=1:null;
         if(multipleChoiceStage){
@@ -188,18 +187,22 @@ let resolveScore=()=>{
         if(scoreItem.misses>2){
             triesLeft.innerHTML+='X'
             console.log('Game Over...');
-            result.innerHTML='Game Over...<br>';
+            result.innerHTML='<h4>Game Over...</h4>';
             console.log(`Your score for this round: ${scoreItem.score}`);
             if(scoreItem.score>scoreItem.topScore){
                 scoreItem.topScore=scoreItem.score;
-                result.innerHTML='New High Score!<br>';
+                result.innerHTML='<h4>New High Score!</h4>';
             }
             console.log(`Your high score:           ${scoreItem.topScore}`)
-            result.innerHTML+=`NUMBER OF QUESTIONS: ${scoreItem.numQuestions}<br>
-            AVERAGE SCORE PER QUESTION: ${(scoreItem.score/scoreItem.numQuestions)}`
+            console.log(scoreItem)
+            result.innerHTML+=`<p>TOTAL QUESTIONS: <span style="font-weight: bold; font-size: 20px">${scoreItem.numQuestions}</span></p>
+                               <p>TEXT GUESSES:    <span style="font-weight: bold; font-size: 20px">${scoreItem.numEntries}</span></p>
+                               <p>AVERAGE SCORE:   <span style="font-weight: bold; font-size: 20px">${(
+                                Math.floor((scoreItem.score/scoreItem.numQuestions)*10)/10)}</span></p>`
             scoreItem.score=0;
             scoreItem.misses=0;
             scoreItem.numQuestions=0;
+            scoreItem.numEntries=0;
             wait=4500;
         }else{console.log(`Current Score: ${scoreItem.score}`);}
         
@@ -368,14 +371,8 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         for(let i in inpArr){
             ansArr.includes(inpArr[i].replace(/[!@#$%^&:.1?*]/g, ""))?wordsRight++:null;
         }
-        if(ansArr.length==1){
-            if(wordsRight>0){
-                isClose=true;
-            }
-        }else{
-            if(wordsRight>0){
-                isClose=true;
-            }
+        if(wordsRight>0){
+            isClose=true;
         }
         if(ansArr.length>2){
             if(inp.value.toLowerCase()==ans.toLowerCase()){
@@ -384,6 +381,9 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         }
         if(isClose){
             result.innerHTML='Correct!';
+            scoreItem.numEntries++;
+            console.log(scoreItem.numEntries);
+            
         }else{
             result.innerHTML+='X';
             score-=1;

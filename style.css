@@ -48,7 +48,8 @@ ul{
 }
 #results-box{
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 .correctLi{
     background-color: rgb(204, 0, 0);
@@ -160,4 +161,9 @@ ul{
     padding: 0 18px;
     font-size: 25px;
     color: #868686;
+  }
+
+  span{
+    display: inline-block;
+    color: rgb(204, 0, 0);
   }
