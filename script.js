@@ -181,10 +181,10 @@ let resolveProperAnswer = async (tag) =>{
 //then sends the points to the total
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
-    if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
+    if(result.innerHTML==('Correct!')||result.innerHTML==('XX')){
         scoreItem.numQuestions++;
 
-        result.innerHTML==('XXX')?miss=1:null;
+        result.innerHTML==('XX')?miss=1:null;
         if(multipleChoiceStage){
             let correctListItem=answers[correctIndex];
             correctListItem.setAttribute('class','correctLi')
