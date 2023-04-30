@@ -43,27 +43,25 @@ for(let x=0;x<scoreItem.misses;x++){
 
 //Connects to an api that bypasses cors restrictions
 async function bypassCors(link){
-    const Aurl = 'https://cors-proxy3.p.rapidapi.com/api';
+ 
+    const Aurl = `https://cors-proxy4.p.rapidapi.com/?url=${link}`;
+    
     const options = {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/x-www-form-urlencoded',
-            'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
-            'X-RapidAPI-Host': 'cors-proxy3.p.rapidapi.com'
-        },
-        body: new URLSearchParams({
-            'my-url': link
-        })
-    };
+	method: 'GET',
+	headers: {
+		'content-type': 'application/octet-stream',
+		'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
+		'X-RapidAPI-Host': 'cors-proxy4.p.rapidapi.com'
+	}
+};
 
-    try {
-        const response = await fetch(Aurl, options);
-        const result = await response.json();
-        return result;
-    } catch (error) {
-        answerBox.innerHTML="CORS Blocking Error";
-        console.error(error);
-    }
+try {
+	const response = await fetch(Aurl, options);
+	const result = await response.json();
+    return result
+} catch (error) {
+	console.error(error);
+}
 }
 
 
