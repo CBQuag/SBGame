@@ -14,7 +14,9 @@ result.innerHTML='';
 let correctIndex;
 let correctAnime;
 
-let url='https://www.sakugabooru.com/'
+// https%3A%2F%2Fwww.sakugabooru.com%2Ftag.json%3Flimit%3D0%26type%3D3
+
+let url='https%3A%2F%2Fwww.sakugabooru.com%2F'
 
 let wait=0;
 let score=3;
@@ -150,7 +152,7 @@ let resolveAnswer=async (sList)=>{
 
 //takes a tag, then runs validation on it for various criteria, sending back a valid post
 let resolveProperAnswer = async (tag) =>{
-    let currentSeries = await bypassCors(`${url}post.json?tags=${tag}`)
+    let currentSeries = await bypassCors(`${url}post.json%3Ftags%3D${tag}`)
     let correctAnswerPromise = new Promise (resolve=>{
         console.log('Filtering...');
         let correctAnswer=validateVideoContent(currentSeries);
@@ -186,15 +188,15 @@ let resolveScore=()=>{
         if(scoreItem.misses>2){
             triesLeft.innerHTML+='X'
             console.log('Game Over...');
-            result.innerHTML='Game Over...';
+            result.innerHTML='Game Over...<br>';
             console.log(`Your score for this round: ${scoreItem.score}`);
             if(scoreItem.score>scoreItem.topScore){
                 scoreItem.topScore=scoreItem.score;
-                result.innerHTML='New High Score!<break>';
+                result.innerHTML='New High Score!<br>';
             }
             console.log(`Your high score:           ${scoreItem.topScore}`)
-            result.innerHTML+=`NUMBER OF QUESTIONS: ${scoreItem.numQuestions}
-            <break>AVERAGE SCORE PER QUESTION: ${(scoreItem.score/scoreItem.numQuestions)}`
+            result.innerHTML+=`NUMBER OF QUESTIONS: ${scoreItem.numQuestions}<br>
+            AVERAGE SCORE PER QUESTION: ${(scoreItem.score/scoreItem.numQuestions)}`
             scoreItem.score=0;
             scoreItem.misses=0;
             scoreItem.numQuestions=0;
@@ -328,6 +330,7 @@ let generateSuggestionBox=(source, sourceA)=>{
 //runs through potential answers until a valid one is found
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
+    console.log("ANSWER", answer)
     let correctAnswer=await resolveProperAnswer(answer);
     if(correctAnswer){
         return {
@@ -392,10 +395,10 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
 
 
 
-//Main program body
+//Main body
 async function buildGame(){
 
-    let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
+    let seriesList=await bypassCors(`${url}tag.json%3Flimit%3D0%26type%3D3`);
 
     let filteredAnswer=await filterAnswers(seriesList);
 
@@ -420,12 +423,6 @@ async function buildGame(){
         resolveScore()
     })
 
-
-    //checks if the submitted answer is right
-    // form.addEventListener('submit',(e)=>{
-    //     e.preventDefault()
-    //     verifyOrContinue()
-    // })
 }
 
 
