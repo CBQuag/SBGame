@@ -11,6 +11,7 @@ let form=document.querySelector('form');
 let result=document.querySelector('#results-box');
 
 let resetButton=document.getElementById('reset-button');
+let restartButton=document.getElementById('restart-button')
 result.innerHTML='';
 
 let correctIndex;
@@ -422,6 +423,14 @@ async function buildGame(){
 
     videoPlayer.innerHTML=`<video width="100%" loop muted autoplay src="${videoContent}"></video>`
     console.log(`${humanize(filteredAnswer.title)} is the answer`);
+
+    restartButton.addEventListener('click', (e)=>{
+        scoreItem.misses=0;
+        scoreItem.score=0;
+        scoreJSON=JSON.stringify(scoreItem);
+        localStorage.setItem('scoreItem',scoreJSON);
+        window.location.reload();
+    })
     
     resetButton.addEventListener('click',(e)=>{
         localStorage.clear();
