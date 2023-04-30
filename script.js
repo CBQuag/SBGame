@@ -27,7 +27,13 @@ let wordsRight=0;
 let scoreJSON=localStorage.getItem('scoreItem');
 
 let scoreItem=JSON.parse(scoreJSON);
-scoreItem?null:scoreItem={score: 0, misses: 0, topScore: 0, numQuestions: 0, numEntries: 0};
+scoreItem?null:scoreItem={
+    score: 0,
+    misses: 0,
+    topScore: 0,
+    numQuestions: 0,
+    numEntries: 0
+};
 
 let currentScoreDisplay=document.getElementById('current-score');
 currentScoreDisplay.innerHTML+=scoreItem.score;
@@ -85,7 +91,6 @@ humanize=(str)=>{
 //gets random titles from the source
 let getRandomTitle=(source)=>{
     let showName=source[getRand(source.length)].name
-    console.log("TRAILING",showName)
     if((showName.slice((showName.length)-4)==`(mv)`)||showName.slice((showName.length)-4)==`(cm)`){
         console.log("Filtering music video...")
         return getRandomTitle(source);
@@ -95,7 +100,7 @@ let getRandomTitle=(source)=>{
         return getRandomTitle(source);
     }
     
-    return source[getRand(source.length)].name
+    return showName;
 };
 
 
@@ -197,7 +202,6 @@ let resolveScore=()=>{
                 result.innerHTML='<h4>New High Score!</h4>';
             }
             console.log(`Your high score:           ${scoreItem.topScore}`)
-            console.log(scoreItem)
             result.innerHTML+=`<p>TOTAL QUESTIONS: <span style="font-weight: bold; font-size: 20px">${scoreItem.numQuestions}</span></p>
                                <p>TEXT GUESSES:    <span style="font-weight: bold; font-size: 20px">${scoreItem.numEntries}</span></p>
                                <p>AVERAGE SCORE:   <span style="font-weight: bold; font-size: 20px">${(
@@ -259,7 +263,7 @@ let fillOutAnswers=(source, answer)=>{
         }
         //fills in other answers
         else{    
-            adjustedName=humanize(getRandomTitle(source))       
+            adjustedName=humanize(getRandomTitle(source))  
             inner=choice.lastElementChild;
             inner.innerHTML=adjustedName;
         }

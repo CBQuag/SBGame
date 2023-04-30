@@ -23,6 +23,9 @@ button{
 h1{
     padding-left: 5%;
 }
+div>ul{
+    padding-left: 3%;
+}
 #video-box{
     width: 90%;
     margin: auto;
