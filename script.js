@@ -96,6 +96,45 @@ let getRandomTitle=(source)=>{
     return source[getRand(source.length)].name
 };
 
+
+//takes a video link and checks if it's a video
+let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
+
+//checks the item to see if it's an anime or not based on the tags
+let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
+
+//checks for content
+let isSafe=(temp)=>temp.rating=='s';
+
+//function that gets a random video link
+validateVideoContent=(promiseResults)=>{
+    let linkList=[];
+    
+    //filters out any items that don't have video links
+    promiseResults.forEach(p=>linkList.push(p));
+    linkList=linkList.filter(links=>isVideo(links.file_url));
+
+    if(linkList.length>0){
+        let tempVid=linkList[getRand(linkList.length)];
+        if(isAnime(tempVid)){
+            console.log("Validating content type...");
+            if(isSafe(tempVid)){
+                return tempVid;
+            }else{
+                console.log('Not safe for work.')
+                return false;
+            }
+        }else{
+            console.log('Not an anime.');
+            return false;
+        }
+    }else{
+        console.log('No Video Content.');
+        return false;
+    }
+}
+
+
 //gets a random series title
 let resolveAnswer=async (sList)=>{
        
@@ -130,47 +169,51 @@ let resolveProperAnswer = async (tag) =>{
 }
 
 
-//takes a video link and checks if it's a video
-let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
+//checks if either three tries have been made or the correct answer,
+//then sends the points to the total
+let resolveScore=()=>{
+    let answers=Array.from(document.querySelectorAll('li'));
+    if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
+        scoreItem.numQuestions++;
 
-
-//checks the item to see if it's an anime or not based on the tags
-let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
-
-
-//checks for content
-let isSafe=(temp)=>temp.rating=='s';
-
-
-//function that gets a random video link
-validateVideoContent=(promiseResults)=>{
-    let linkList=[];
-    
-    //filters out any items that don't have video links
-    promiseResults.forEach(p=>linkList.push(p));
-    linkList=linkList.filter(links=>isVideo(links.file_url));
-
-    if(linkList.length>0){
-        let tempVid=linkList[getRand(linkList.length)];
-        if(isAnime(tempVid)){
-            console.log("Validating content type...");
-            if(isSafe(tempVid)){
-                return tempVid;
-            }else{
-                console.log('Not safe for work.')
-                return false;
-            }
-        }else{
-            console.log('Not an anime.');
-            return false;
+        result.innerHTML==('XXX')?miss=1:null;
+        if(multipleChoiceStage){
+            let correctListItem=answers[correctIndex];
+            correctListItem.setAttribute('class','correctLi')
         }
-    }else{
-        console.log('No Video Content.');
-        return false;
+
+        scoreItem.score+=score;
+        scoreItem.misses+=miss;
+
+        if(scoreItem.misses>2){
+            triesLeft.innerHTML+='X'
+            console.log('Game Over...');
+            result.innerHTML='Game Over...';
+            console.log(`Your score for this round: ${scoreItem.score}`);
+            if(scoreItem.score>scoreItem.topScore){
+                scoreItem.topScore=scoreItem.score;
+                result.innerHTML='New High Score!<break>';
+            }
+            console.log(`Your high score:           ${scoreItem.topScore}`)
+            result.innerHTML+=`NUMBER OF QUESTIONS: ${scoreItem.numQuestions}
+            <break>AVERAGE SCORE PER QUESTION: ${(scoreItem.score/scoreItem.numQuestions)}`
+            scoreItem.score=0;
+            scoreItem.misses=0;
+            scoreItem.numQuestions=0;
+            wait=4500;
+        }else{console.log(`Current Score: ${scoreItem.score}`);}
+        
+        scoreJSON=JSON.stringify(scoreItem);
+        localStorage.setItem('scoreItem',scoreJSON);
+
+        setTimeout(function(){
+            window.location.reload();
+        },1500+wait);
     }
 }
 
 
+//generates multiple choice answers if the user misses the text input
 let fillOutAnswers=(source, answer)=>{
     legend.innerHTML=`SELECT A TITLE`
     answerBox.innerHTML=`<ul>
@@ -217,45 +260,69 @@ let fillOutAnswers=(source, answer)=>{
 }
 
 
-let resolveScore=()=>{
-    let answers=Array.from(document.querySelectorAll('li'));
-    if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
-        scoreItem.numQuestions++;
+//draws the text box for entry, and gives it the capability to 
+//make suggestions based on the complete list of series available
+let generateSuggestionBox=(source, sourceA)=>{
+    let answer=humanize(sourceA)
 
-        result.innerHTML==('XXX')?miss=1:null;
-        if(multipleChoiceStage){
-            let correctListItem=answers[correctIndex];
-            correctListItem.setAttribute('class','correctLi')
+    let anime = [];
+    source.forEach(n=>{
+        anime.push(humanize(n.name))
+    })
+    anime.sort();
+
+    let input = document.getElementById("input");
+    input.focus();
+    let suggestion = document.getElementById("suggestion");
+    const enterKey = 13;
+    const rightArrow=39;
+    window.onload = () => {
+        input.value = "";
+        suggestion.innerHTML = "";
+    };       
+    const caseCheck = (word) => {
+    word = word.split("");
+    let inp = input.value;
+    for (let i in inp) {
+        if (inp[i] == word[i]) {
+            continue;
+        } else if (inp[i].toUpperCase() == word[i]) {
+            word.splice(i, 1, word[i].toLowerCase());
+        } else {
+            word.splice(i, 1, word[i].toUpperCase());
         }
-
-        scoreItem.score+=score;
-        scoreItem.misses+=miss;
-
-        if(scoreItem.misses>2){
-            triesLeft.innerHTML+='X'
-            console.log('Game Over...');
-            result.innerHTML='Game Over...';
-            console.log(`Your score for this round: ${scoreItem.score}`);
-            if(scoreItem.score>scoreItem.topScore){
-                scoreItem.topScore=scoreItem.score;
-                result.innerHTML='New High Score!<break>';
+        }
+        return word.join("");
+    };
+    input.addEventListener("input", (e) => {
+    suggestion.innerHTML = "";
+    let regex = new RegExp("^" + input.value, "i");
+        for (let i in anime) {
+            if (regex.test(anime[i]) && input.value != "") {
+                anime[i] = caseCheck(anime[i]);
+                suggestion.innerHTML = anime[i];
+                break;
             }
-            console.log(`Your high score:           ${scoreItem.topScore}`)
-            result.innerHTML+=`NUMBER OF QUESTIONS: ${scoreItem.numQuestions}
-            <break>AVERAGE SCORE PER QUESTION: ${(scoreItem.score/scoreItem.numQuestions)}`
-            scoreItem.score=0;
-            scoreItem.misses=0;
-            scoreItem.numQuestions=0;
-            wait=4500;
-        }else{console.log(`Current Score: ${scoreItem.score}`);}
-        
-        scoreJSON=JSON.stringify(scoreItem);
-        localStorage.setItem('scoreItem',scoreJSON);
+        }
+    });
+    input.addEventListener("keydown", (e) => {
+        if (e.keyCode == rightArrow && suggestion.innerText != "") {
+            e.preventDefault();
+            input.value = suggestion.innerText;
+            suggestion.innerHTML = "";            
+        }else if (e.keyCode == enterKey) {
+            e.preventDefault();
+            suggestion.innerHTML = "";  
+            verifyOrContinue(input,answer,source,sourceA);
+            resolveScore()                  
+        }
+    });
 
-        setTimeout(function(){
-            window.location.reload();
-        },1500+wait);
-    }
+    submitButton.addEventListener('click',(e)=>{
+        e.preventDefault();
+        verifyOrContinue(input,answer,source,sourceA);
+        resolveScore()
+    })
 }
 
 
@@ -274,6 +341,8 @@ async function filterAnswers(SL){
 }
 
 
+//provides functionality to the submit button to check inputs over multiple 
+//stages of the game, and adjusts the score awarded
 let verifyOrContinue=(inp,ans,list,ans2)=>{
     if(multipleChoiceStage){
         console.log('clicked multiple')
@@ -322,86 +391,9 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
     }
 }
 
-let generateSuggestionBox=(source, sourceA)=>{
-    let answer=humanize(sourceA)
-
-    let anime = [];
-    source.forEach(n=>{
-        anime.push(humanize(n.name))
-    })
-    anime.sort();
-
-    let input = document.getElementById("input");
-    input.focus();
-    let suggestion = document.getElementById("suggestion");
-    const enterKey = 13;
-    const rightArrow=39;
-    window.onload = () => {
-        input.value = "";
-        suggestion.innerHTML = "";
-    };       
-    const caseCheck = (word) => {
-    //Array of characters
-    word = word.split("");
-    let inp = input.value;
-    //loop through every character in ino
-    for (let i in inp) {
-        //if input character matches with character in word no need to change
-        if (inp[i] == word[i]) {
-            continue;
-        } else if (inp[i].toUpperCase() == word[i]) {
-            //if inp[i] when converted to uppercase matches word[i] it means word[i] needs to be lowercase
-            word.splice(i, 1, word[i].toLowerCase());
-        } else {
-            //word[i] needs to be uppercase
-            word.splice(i, 1, word[i].toUpperCase());
-        }
-        }
-        //array to string
-        return word.join("");
-    };
-    
-    //Execute function on input
-    input.addEventListener("input", (e) => {
-    suggestion.innerHTML = "";
-    //Convert input value to regex since string.startsWith() is case sensitive
-    let regex = new RegExp("^" + input.value, "i");
-        //loop through words array
-        for (let i in anime) {
-            //check if input matches with any word in words array
-            if (regex.test(anime[i]) && input.value != "") {
-                //Change case of word in words array according to user input
-                anime[i] = caseCheck(anime[i]);
-                //display suggestion
-                suggestion.innerHTML = anime[i];
-                break;
-            }
-        }
-    });
-    
-    //Complete predictive text on enter key
-    input.addEventListener("keydown", (e) => {
-    //When user presses enter and suggestion exists
-        if (e.keyCode == rightArrow && suggestion.innerText != "") {
-            e.preventDefault();
-            input.value = suggestion.innerText;
-            suggestion.innerHTML = "";            
-        }else if (e.keyCode == enterKey) {
-            e.preventDefault();
-            suggestion.innerHTML = "";  
-            verifyOrContinue(input,answer,source,sourceA);
-            resolveScore()                  
-        }
-    });
-
-    submitButton.addEventListener('click',(e)=>{
-        e.preventDefault();
-        verifyOrContinue(input,answer,source,sourceA);
-        resolveScore()
-    })
-}
 
 
+//Main program body
 async function buildGame(){
 
     let seriesList=await bypassCors(`${url}tag.json?limit=0&type=3`);
@@ -431,10 +423,10 @@ async function buildGame(){
 
 
     //checks if the submitted answer is right
-    form.addEventListener('submit',(e)=>{
-        e.preventDefault()
-        verifyOrContinue()
-    })
+    // form.addEventListener('submit',(e)=>{
+    //     e.preventDefault()
+    //     verifyOrContinue()
+    // })
 }
 
 
