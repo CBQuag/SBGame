@@ -6,6 +6,7 @@ let legend=document.querySelector('legend');
 let answerBox=document.querySelector('#inner-answer-box');
 let submitButton=document.getElementById('submit-button')
 
+
 let form=document.querySelector('form');
 
 let result=document.querySelector('#results-box');
