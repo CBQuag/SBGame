@@ -12,6 +12,9 @@ button{
     display: flex;
     flex-direction: column;
     align-items: end;
+    position: fixed;
+    bottom: 0;
+    right:0;
 }
 #reset-button,#restart-button{
     background: none;

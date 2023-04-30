@@ -85,6 +85,7 @@ humanize=(str)=>{
 //gets random titles from the source
 let getRandomTitle=(source)=>{
     let showName=source[getRand(source.length)].name
+    console.log("TRAILING",showName)
     if((showName.slice((showName.length)-4)==`(mv)`)||showName.slice((showName.length)-4)==`(cm)`){
         console.log("Filtering music video...")
         return getRandomTitle(source);
@@ -176,7 +177,6 @@ let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
     if(result.innerHTML==('Correct!')||result.innerHTML==('XXX')){
         scoreItem.numQuestions++;
-        console.log(scoreItem.numQuestions);
 
         result.innerHTML==('XXX')?miss=1:null;
         if(multipleChoiceStage){
@@ -336,7 +336,6 @@ let generateSuggestionBox=(source, sourceA)=>{
 //runs through potential answers until a valid one is found
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
-    console.log("ANSWER", answer)
     let correctAnswer=await resolveProperAnswer(answer);
     if(correctAnswer){
         return {
@@ -397,7 +396,6 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         if(isClose){
             result.innerHTML='Correct!';
             scoreItem.numEntries++;
-            console.log(scoreItem.numEntries);
             
         }else{
             result.innerHTML+='X';
