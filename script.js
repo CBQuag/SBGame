@@ -216,23 +216,24 @@ let resolveScore=()=>{
 //generates multiple choice answers if the user misses the text input
 let fillOutAnswers=(source, answer)=>{
     legend.innerHTML=`SELECT A TITLE`
-    answerBox.innerHTML=`<ul>
-    <li>
-        <input type="radio" id="first"  value="0"   name="answer">
-        <label for="first">Waiting...</label>
-    </li>
-    <li>
-        <input type="radio" id="second" value="1"   name="answer">
-        <label for="second">Waiting...</label>
-    <li>
-        <input type="radio" id="third"  value="2"   name="answer">
-        <label for="third">Waiting...</label>
-    </li>
-    <li>
-        <input type="radio" id="fourth" value="3"   name="answer">
-        <label for="fourth">Waiting...</label>
-    </li>
-</ul>`;
+    answerBox.innerHTML=`
+    <ul>
+        <li>
+            <input type="radio" id="first"  value="0"   name="answer">
+            <label for="first">Waiting...</label>
+        </li>
+        <li>
+            <input type="radio" id="second" value="1"   name="answer">
+            <label for="second">Waiting...</label>
+        <li>
+            <input type="radio" id="third"  value="2"   name="answer">
+            <label for="third">Waiting...</label>
+        </li>
+        <li>
+            <input type="radio" id="fourth" value="3"   name="answer">
+            <label for="fourth">Waiting...</label>
+        </li>
+    </ul>`;
 
     let answers=Array.from(document.querySelectorAll('li'));
 
