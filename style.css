@@ -135,7 +135,7 @@ ul{
 
   .input-container {
     position: relative;
-    max-width: 80%;
+    width: 90%;
     height: 4.4em;
     border-radius: 5px;
   }
@@ -145,7 +145,7 @@ ul{
     border: none;
     background-color: transparent;
     position: absolute;
-    max-width: 100%;
+    width: 100%;
     height: inherit;
     color:white;
     font-size: 25px;
