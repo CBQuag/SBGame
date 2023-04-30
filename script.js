@@ -377,7 +377,6 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
                 result.innerHTML+='X';
                 score-=1;
             }
-            resolveScore()
         }
     }else{
         let inpArr=inp.value.toLowerCase().split(' ')
