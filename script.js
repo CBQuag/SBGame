@@ -22,8 +22,8 @@ let filteredAnswer;
 
 let url='https%3A%2F%2Fwww.sakugabooru.com%2F'
 
-let wait=0;
 let score=2;
+let wait=0;
 let miss=0;
 let wordsRight=0;
 
@@ -97,31 +97,23 @@ let getRandomTitle=(source)=>{
 };
 
 
-//takes a video link and checks if it's a video
-let isVideo=(linkI)=>linkI.slice(linkI.length-3)==('mp4'||'ebm');
-
-//checks the item to see if it's an anime or not based on the tags
-let isAnime=(temp)=>!(temp.tags.split(' ')).includes('western');
-
-//checks for content
-let isSafe=(temp)=>temp.rating=='s';
-
 //function that gets a random video link
 validateVideoContent=(promiseResults)=>{
     let linkList=[];
     promiseResults.forEach(p=>linkList.push(p));
-    linkList=linkList.filter(links=>isVideo(links.file_url));
+    linkList=linkList.filter(links=>
+        links.file_url.slice(links.file_url.length-3)==('mp4'||'ebm'));
     console.log("Validating content type...");
     if(linkList.length<=0){
         console.log('No Video Content.');
         return false;
     }
     let tempVid=linkList[getRand(linkList.length)];
-    if(!isAnime(tempVid)){
+    if(tempVid.tags.split(' ').includes('western')){
         console.log('Not an anime.');
         return false;
     }
-    if(!isSafe(tempVid)){
+    if(tempVid.rating!=='s'){
         console.log('Not safe for work.');
         return false;
     }
@@ -130,16 +122,11 @@ validateVideoContent=(promiseResults)=>{
 
 
 //gets a random series title
-let resolveAnswer=async (sList)=>{
-       
+let resolveAnswer=async (sList)=>{      
     let answerPromise = new Promise(resolve=>{
-
         console.log('Getting an answer...')
-
-        resolve(getRandomTitle(sList));
-         
+        resolve(getRandomTitle(sList));    
     })
-
     return answerPromise;    
 }
 
@@ -398,29 +385,21 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
 }
 
 
-
 //Main body
 async function buildGame(){
-
     seriesList=await bypassCors(`${url}tag.json%3Flimit%3D0%26type%3D3`);
-
     filteredAnswer=await filterAnswers(seriesList);
-
-    generateSuggestionBox();
-    
+    generateSuggestionBox();  
     let videoContent = await filteredAnswer.choice.file_url
-
     videoPlayer.innerHTML=`<video width="100%" loop muted autoplay src="${videoContent}"></video>`
     console.log(`${humanize(filteredAnswer.title)} is the answer`);
-
     restartButton.addEventListener('click', (e)=>{
         scoreItem.misses=0;
         scoreItem.score=0;
         scoreJSON=JSON.stringify(scoreItem);
         localStorage.setItem('scoreItem',scoreJSON);
         window.location.reload();
-    })
-    
+    })   
     resetButton.addEventListener('click',(e)=>{
         localStorage.clear();
         window.location.reload();
