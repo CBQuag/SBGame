@@ -283,8 +283,8 @@ let generateSuggestionBox=()=>{
         return word.join("");
     };
     input.addEventListener("input", (e) => {
-    suggestion.innerHTML = "";
-    let regex = new RegExp("^" + input.value, "i");
+        suggestion.innerHTML = "";
+        let regex = new RegExp("^" + input.value, "i");
         for (let i in anime) {
             if (regex.test(anime[i]) && input.value != "") {
                 anime[i] = caseCheck(anime[i]);
