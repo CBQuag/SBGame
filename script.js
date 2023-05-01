@@ -125,6 +125,7 @@ validateVideoContent=(promiseResults)=>{
         console.log('No Video Content.');
         return false;
     }
+    let tempVid=linkList[getRand(linkList.length)];
     if(!isAnime(tempVid)){
         console.log('Not an anime.');
         return false;
@@ -194,8 +195,6 @@ let endGame=()=>{
     scoreItem.numQuestions=0;
     scoreItem.numEntries=0;
     wait=8500;
-    scoreJSON=JSON.stringify(scoreItem);
-    localStorage.setItem('scoreItem',scoreJSON);
 }
 
 //checks if either three tries have been made or the correct answer,
@@ -214,7 +213,9 @@ let resolveScore=()=>{
     if(scoreItem.misses>2){
         wait=8500;
         endGame();
-    } 
+    }
+    scoreJSON=JSON.stringify(scoreItem);
+    localStorage.setItem('scoreItem',scoreJSON); 
     setTimeout(()=>{
         window.location.reload();
     },1500+wait);
