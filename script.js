@@ -158,8 +158,7 @@ let resolveProperAnswer = async (tag) =>{
     let correctAnswerPromise = new Promise (resolve=>{
         console.log('Filtering...');
         let correctAnswer=validateVideoContent(currentSeries);
-        correctAnswer?validLink=true:validLink=false;
-        if(validLink){
+        if(correctAnswer){
             console.log('Got an answer!')
             resolve(correctAnswer)
         }else{
