@@ -1,19 +1,18 @@
 let multipleChoiceStage=false;
 
-let videoPlayer=document.querySelector('#video-box');
+let videoPlayer         =document.querySelector('#video-box');
+let legend              =document.querySelector('legend');
+let answerBox           =document.querySelector('#inner-answer-box');
+let submitButton        =document.getElementById('submit-button');
+let form                =document.querySelector('form');
+let result              =document.querySelector('#results-box');
+let fullNameDisplay     =document.getElementById('correct-name')
+let resetButton         =document.getElementById('reset-button');
+let restartButton       =document.getElementById('restart-button');
+let currentScoreDisplay =document.getElementById('current-score');
+let highScoreDisplay    =document.getElementById('high-score');
+let triesLeft           =document.getElementById('tries-left');
 
-let legend=document.querySelector('legend');
-let answerBox=document.querySelector('#inner-answer-box');
-let submitButton=document.getElementById('submit-button');
-
-
-let form=document.querySelector('form');
-
-let result=document.querySelector('#results-box');
-let fullNameDisplay=document.getElementById('correct-name')
-
-let resetButton=document.getElementById('reset-button');
-let restartButton=document.getElementById('restart-button');
 result.innerHTML='';
 
 let correctIndex;
@@ -29,7 +28,6 @@ let miss=0;
 let wordsRight=0;
 
 let scoreJSON=localStorage.getItem('scoreItem');
-
 let scoreItem=JSON.parse(scoreJSON);
 scoreItem?null:scoreItem={
     score: 0,
@@ -39,12 +37,9 @@ scoreItem?null:scoreItem={
     numEntries: 0
 };
 
-let currentScoreDisplay=document.getElementById('current-score');
-currentScoreDisplay.innerHTML+=scoreItem.score;
-let highScoreDisplay=document.getElementById('high-score');
-highScoreDisplay.innerHTML+=scoreItem.topScore;
-let triesLeft=document.getElementById('tries-left');
 
+currentScoreDisplay.innerHTML+=scoreItem.score;
+highScoreDisplay.innerHTML+=scoreItem.topScore;
 
 
 //draws x's for strikes
