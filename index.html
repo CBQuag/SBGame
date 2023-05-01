@@ -11,49 +11,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>SAKU<wbr><span>GUESSR</span></h1>
-    </header>
-    <div id="video-box">
-        <div id="loading-box">
-            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-        </div>   
-    </div>
-    <div id="score-window">
-        <div id="score-box">
-            <h4>SCORE</h4><h2 id="current-score"></h2>
-        </div>
-        <div id="goal-box">
-            <h4>HIGH SCORE</h4><h2 id="high-score"></h2>
-        </div>
-        <div id="tries-box">
-            <h4>STRIKES</h4><h2 id="tries-left"></h2>
-        </div>
-    </div>
-    <form>
-        <fieldset id="answer-box">
-            <legend>ENTER A TITLE</legend>
-            <div id="inner-answer-box">
-                <div class="input-container">
-                    <input
-                      type="text"
-                      id="input"
-                      placeholder=""
-                      autocomplete="off"
-                    />
-                    <span id="suggestion"></span>
-                  </div>
+    <div id="wrapper">
+        <header>
+            <h1>SAKU<wbr><span>GUESSR</span></h1>
+        </header>
+        <section id="main-content">
+            <div id="video-box">
+                <div id="loading-box">
+                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                </div>   
             </div>
-            <div id="submit-button-box">
-                <button type="submit" id="submit-button">SUBMIT</button>
-            </div>
-        </fieldset>
-    </form>
-    <div id="results-box"></div>
-    <div id="correct-name"></div>
-    <div id="reset-button-box">
-        <button id="restart-button">RESTART</button>
-        <button id="reset-button">RESET</button>
+            <section id="right-side">
+                <div id="score-window">
+                    <div id="score-box">
+                        <h4>SCORE</h4><h2 id="current-score"></h2>
+                    </div>
+                    <div id="goal-box">
+                        <h4>HIGH SCORE</h4><h2 id="high-score"></h2>
+                    </div>
+                    <div id="tries-box">
+                        <h4>STRIKES</h4><h2 id="tries-left"></h2>
+                    </div>
+                </div>
+                <form>
+                    <fieldset id="answer-box">
+                        <legend>ENTER A TITLE</legend>
+                        <div id="inner-answer-box">
+                            <div class="input-container">
+                                <input
+                                type="text"
+                                id="input"
+                                placeholder=""
+                                autocomplete="off"
+                                />
+                                <span id="suggestion"></span>
+                            </div>
+                        </div>
+                        <div id="submit-button-box">
+                            <button type="submit" id="submit-button">SUBMIT</button>
+                        </div>
+                    </fieldset>
+                </form>
+                <div id="results-box"></div>
+                <div id="correct-name"></div>
+                <div id="reset-button-box">
+                    <button id="restart-button">RESTART</button>
+                    <button id="reset-button">RESET</button>
+                </div>
+            </section>
+        </section>
     </div>
     <script src="script.js"></script>
 </body>

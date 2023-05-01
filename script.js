@@ -214,7 +214,7 @@ let resolveScore=()=>{
             scoreItem.misses=0;
             scoreItem.numQuestions=0;
             scoreItem.numEntries=0;
-            wait=4500;
+            wait=8500;
         }else{console.log(`Current Score: ${scoreItem.score}`);}
         
         scoreJSON=JSON.stringify(scoreItem);
@@ -402,7 +402,7 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
                 score+=1;
                 result.innerHTML='Perfect!';
             }else{
-                fullNameDisplay.innerHTML+=`<p style='font-size: 20px;margin-top:10px'>${ans}</p>`
+                fullNameDisplay.innerHTML+=`<p style='font-size: 20px;margin-top:10px;'>${ans}</p>`
             }
             
         }else{
