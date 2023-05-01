@@ -128,7 +128,7 @@ ul{
     }
     #results-box,#correct-name{
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: center;
     }
 }
