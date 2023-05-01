@@ -170,52 +170,53 @@ let resolveProperAnswer = async (tag) =>{
 }
 
 
+//ends the game, checks to see if the high score should be updated, displays 
+//stats for the game, then resets the game
+let endGame=()=>{
+    triesLeft.innerHTML+='X'
+    console.log('Game Over...');
+    console.log(`Your score for this round: ${scoreItem.score}`);
+    result.innerHTML='<h4>Game Over...</h4>';
+    if(scoreItem.score>scoreItem.topScore){
+        scoreItem.topScore=scoreItem.score;
+        result.innerHTML='<h4>New High Score!</h4>';
+    }
+    console.log(`Your high score:           ${scoreItem.topScore}`)
+    result.innerHTML+=`
+        <p>TOTAL QUESTIONS: <span style="font-weight: bold; font-size: 20px">
+        ${scoreItem.numQuestions}</span></p>
+        <p>TEXT GUESSES:    <span style="font-weight: bold; font-size: 20px">
+        ${scoreItem.numEntries}</span></p>
+        <p>AVERAGE SCORE:   <span style="font-weight: bold; font-size: 20px">
+        ${(Math.floor((scoreItem.score/scoreItem.numQuestions)*10)/10)}</span></p>`
+    scoreItem.score=0;
+    scoreItem.misses=0;
+    scoreItem.numQuestions=0;
+    scoreItem.numEntries=0;
+    wait=8500;
+    scoreJSON=JSON.stringify(scoreItem);
+    localStorage.setItem('scoreItem',scoreJSON);
+}
+
 //checks if either three tries have been made or the correct answer,
 //then sends the points to the total
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
-    if(result.innerHTML==('Correct!')
-    ||result.innerHTML==('XX')
-    ||result.innerHTML==('Perfect!')){
-        scoreItem.numQuestions++;
-
-        result.innerHTML==('XX')?miss=1:null;
-        if(multipleChoiceStage){
-            let correctListItem=answers[correctIndex];
-            correctListItem.setAttribute('class','correctLi')
-        }
-
-        scoreItem.score+=score;
-        scoreItem.misses+=miss;
-
-        if(scoreItem.misses>2){
-            triesLeft.innerHTML+='X'
-            console.log('Game Over...');
-            result.innerHTML='<h4>Game Over...</h4>';
-            console.log(`Your score for this round: ${scoreItem.score}`);
-            if(scoreItem.score>scoreItem.topScore){
-                scoreItem.topScore=scoreItem.score;
-                result.innerHTML='<h4>New High Score!</h4>';
-            }
-            console.log(`Your high score:           ${scoreItem.topScore}`)
-            result.innerHTML+=`<p>TOTAL QUESTIONS: <span style="font-weight: bold; font-size: 20px">${scoreItem.numQuestions}</span></p>
-                               <p>TEXT GUESSES:    <span style="font-weight: bold; font-size: 20px">${scoreItem.numEntries}</span></p>
-                               <p>AVERAGE SCORE:   <span style="font-weight: bold; font-size: 20px">${(
-                                Math.floor((scoreItem.score/scoreItem.numQuestions)*10)/10)}</span></p>`
-            scoreItem.score=0;
-            scoreItem.misses=0;
-            scoreItem.numQuestions=0;
-            scoreItem.numEntries=0;
-            wait=8500;
-        }else{console.log(`Current Score: ${scoreItem.score}`);}
-        
-        scoreJSON=JSON.stringify(scoreItem);
-        localStorage.setItem('scoreItem',scoreJSON);
-
-        setTimeout(function(){
-            window.location.reload();
-        },1500+wait);
-    }
+    let endState=['Correct!','XX','Perfect!']
+    if(!endState.includes(result.innerHTML))
+        return;
+    if(multipleChoiceStage)
+        answers[correctIndex].setAttribute('class','correctLi')
+    scoreItem.numQuestions++;
+    result.innerHTML==('XX')?scoreItem.misses+=1:scoreItem.score+=score;
+    console.log(`Current Score: ${scoreItem.score}`);
+    if(scoreItem.misses>2){
+        wait=8500;
+        endGame();
+    } 
+    setTimeout(()=>{
+        window.location.reload();
+    },1500+wait);
 }
 
 
