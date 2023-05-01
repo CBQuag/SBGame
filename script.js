@@ -118,29 +118,22 @@ let isSafe=(temp)=>temp.rating=='s';
 //function that gets a random video link
 validateVideoContent=(promiseResults)=>{
     let linkList=[];
-    
-    //filters out any items that don't have video links
     promiseResults.forEach(p=>linkList.push(p));
     linkList=linkList.filter(links=>isVideo(links.file_url));
-
-    if(linkList.length>0){
-        let tempVid=linkList[getRand(linkList.length)];
-        if(isAnime(tempVid)){
-            console.log("Validating content type...");
-            if(isSafe(tempVid)){
-                return tempVid;
-            }else{
-                console.log('Not safe for work.')
-                return false;
-            }
-        }else{
-            console.log('Not an anime.');
-            return false;
-        }
-    }else{
+    console.log("Validating content type...");
+    if(linkList.length<=0){
         console.log('No Video Content.');
         return false;
     }
+    if(!isAnime(tempVid)){
+        console.log('Not an anime.');
+        return false;
+    }
+    if(!isSafe(tempVid)){
+        console.log('Not safe for work.');
+        return false;
+    }
+    return tempVid;
 }
 
 
