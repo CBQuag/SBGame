@@ -50,10 +50,8 @@ for(let x=0;x<scoreItem.misses;x++){
 
 
 //Connects to an api that bypasses cors restrictions
-async function bypassCors(link){
- 
-    const Aurl = `https://cors-proxy4.p.rapidapi.com/?url=${link}`;
-    
+async function bypassCors(link){ 
+    const apiUrl = `https://cors-proxy4.p.rapidapi.com/?url=${link}`;   
     const options = {
 	method: 'GET',
 	headers: {
@@ -61,15 +59,14 @@ async function bypassCors(link){
 		'X-RapidAPI-Key': '877a5a72fcmsh2a871114e09a22ep1a5bf4jsnff157ccbd13b',
 		'X-RapidAPI-Host': 'cors-proxy4.p.rapidapi.com'
 	}
-};
-
-try {
-	const response = await fetch(Aurl, options);
-	const result = await response.json();
-    return result
-} catch (error) {
-	console.error(error);
-}
+    };
+    try {
+        const response = await fetch(apiUrl, options);
+        const result = await response.json();
+        return result
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 
@@ -77,7 +74,7 @@ try {
 let getRand=(num)=>Math.floor(Math.random()*num);
 
 
-//function to convert strings to more readable formats
+//function to convert the tags to more readable formats
 humanize=(str)=>{
     var i, frags = str.split('_');
     for (i=0; i<frags.length; i++) {
@@ -90,16 +87,13 @@ humanize=(str)=>{
 //gets random titles from the source
 let getRandomTitle=(source)=>{
     let showName=source[getRand(source.length)].name
-    if((showName.slice((showName.length)-4)==`(mv)`)||showName.slice((showName.length)-4)==`(cm)`){
-        console.log("Filtering music video...")
+    let checkName=showName.split('_');
+    let filteredContent=['(cm)','(mv)','mv','cm','(video game)'];
+    if(filteredContent.includes(checkName[checkName.length-1])){
+        console.log("Filtering non valid content...")
         return getRandomTitle(source);
     }
-    else if((showName.slice((showName.length)-12).toLowerCase()==`(video game)`)){
-        console.log("Filtering video game...")
-        return getRandomTitle(source);
-    }
-    
-    return showName;
+    return showName; 
 };
 
 
