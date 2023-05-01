@@ -18,6 +18,8 @@ result.innerHTML='';
 
 let correctIndex;
 let correctAnime;
+let seriesList;
+let filteredAnswer;
 
 let url='https%3A%2F%2Fwww.sakugabooru.com%2F'
 
@@ -223,7 +225,7 @@ let resolveScore=()=>{
 
 
 //generates multiple choice answers if the user misses the text input
-let fillOutAnswers=(source, answer)=>{
+let fillOutAnswers=()=>{
     legend.innerHTML=`SELECT A TITLE`
     answerBox.innerHTML=`
     <ul>
@@ -256,13 +258,13 @@ let fillOutAnswers=(source, answer)=>{
         //fills in correct answer
         if(answers.indexOf(choice)==correctIndex){
             inner=choice.lastElementChild;
-            adjustedName=humanize(answer);
+            adjustedName=humanize(filteredAnswer.title);
             inner.innerHTML=adjustedName;
             return correctIndex;
         }
         //fills in other answers
         else{    
-            adjustedName=humanize(getRandomTitle(source))  
+            adjustedName=humanize(getRandomTitle(seriesList))  
             inner=choice.lastElementChild;
             inner.innerHTML=adjustedName;
         }
@@ -272,11 +274,11 @@ let fillOutAnswers=(source, answer)=>{
 
 //draws the text box for entry, and gives it the capability to 
 //make suggestions based on the complete list of series available
-let generateSuggestionBox=(source, sourceA)=>{
-    let answer=humanize(sourceA)
+let generateSuggestionBox=()=>{
+    let answer=humanize(filteredAnswer.title)
 
     let anime = [];
-    source.forEach(n=>{
+    seriesList.forEach(n=>{
         anime.push(humanize(n.name))
     })
     anime.sort();
@@ -323,14 +325,14 @@ let generateSuggestionBox=(source, sourceA)=>{
         }else if (e.keyCode == enterKey) {
             e.preventDefault();
             suggestion.innerHTML = "";  
-            verifyOrContinue(input,answer,source,sourceA);
+            verifyOrContinue(input,answer);
             resolveScore()                  
         }
     });
 
     submitButton.addEventListener('click',(e)=>{
         e.preventDefault();
-        verifyOrContinue(input,answer,source,sourceA);
+        verifyOrContinue(input,answer);
         resolveScore()
     })
 }
@@ -340,13 +342,11 @@ let generateSuggestionBox=(source, sourceA)=>{
 async function filterAnswers(SL){
     let answer= await resolveAnswer(SL);
     let correctAnswer=await resolveProperAnswer(answer);
-    if(correctAnswer){
-        return {
+    if(!correctAnswer)
+        return await filterAnswers(SL);
+    return {
             title:answer,
             choice:correctAnswer
-        }
-    }else{
-        return await filterAnswers(SL);
     }
 }
 
@@ -355,7 +355,7 @@ async function filterAnswers(SL){
 //stages of the game, and adjusts the score awarded
 let verifyOrContinue=(inp,ans,list,ans2)=>{
     document.addEventListener('keypress', (e)=>{
-        let keyIndex=e.code.slice(e.code.length-1)
+        let keyIndex=e.code.slice(e.code.length-1);
         if((keyIndex>0)&&(keyIndex<=4)){
             if(keyIndex==correctIndex+1){
                 result.innerHTML='Correct!';
@@ -367,7 +367,6 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
         resolveScore()
     })
     if(multipleChoiceStage){
-        console.log('clicked multiple')
         const data= new FormData(form);
         for(const entry of data){
             if(entry[1]==correctIndex){
@@ -414,11 +413,11 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
 //Main body
 async function buildGame(){
 
-    let seriesList=await bypassCors(`${url}tag.json%3Flimit%3D0%26type%3D3`);
+    seriesList=await bypassCors(`${url}tag.json%3Flimit%3D0%26type%3D3`);
 
-    let filteredAnswer=await filterAnswers(seriesList);
+    filteredAnswer=await filterAnswers(seriesList);
 
-    generateSuggestionBox(seriesList, filteredAnswer.title);
+    generateSuggestionBox();
     
     let videoContent = await filteredAnswer.choice.file_url
 
