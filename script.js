@@ -203,6 +203,7 @@ let endGame=()=>{
 let resolveScore=()=>{
     let answers=Array.from(document.querySelectorAll('li'));
     let endState=['Correct!','XX','Perfect!']
+    //checks if it hasn't finished yet
     if(!endState.includes(result.innerHTML))
         return;
     if(multipleChoiceStage)
