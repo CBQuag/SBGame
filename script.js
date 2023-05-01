@@ -287,14 +287,14 @@ let generateSuggestionBox=()=>{
         }else if (e.code == 'Enter') {
             e.preventDefault();
             suggestion.innerHTML = '';  
-            verifyOrContinue(input,answer);
+            verifyOrContinue();
             resolveScore()                  
         }
     });
 
     submitButton.addEventListener('click',(e)=>{
         e.preventDefault();
-        verifyOrContinue(input,answer);
+        verifyOrContinue();
         resolveScore()
     })
 }
@@ -315,17 +315,18 @@ async function filterAnswers(SL){
 
 //provides functionality to the submit button to check inputs over multiple 
 //stages of the game, and adjusts the score awarded
-let verifyOrContinue=(inp,ans,list,ans2)=>{
+let verifyOrContinue=()=>{
+
     document.addEventListener('keypress', (e)=>{
         let keyIndex=e.code.slice(e.code.length-1);
-        if((keyIndex>0)&&(keyIndex<=4)){
-            if(keyIndex==correctIndex+1){
-                result.innerHTML='Correct!';
-            }else{
-                result.innerHTML+='X';
-                score-=1;
-            }
-        }
+        if((keyIndex<=0)||(keyIndex>4))
+            return;
+        if(keyIndex==correctIndex+1){
+            result.innerHTML='Correct!';
+        }else{
+            result.innerHTML+='X';
+            score-=1;
+        }  
         resolveScore()
     })
     if(multipleChoiceStage){
@@ -339,32 +340,24 @@ let verifyOrContinue=(inp,ans,list,ans2)=>{
             }
         }
     }else{
-        let inpArr=inp.value.toLowerCase().split(' ')
-        let ansArr=ans.toLowerCase().split(' ')
-        let isClose=false;
-        for(let i in ansArr){
-            ansArr[i]=ansArr[i].replace(/[!@#$%^&:.'?*]/g, "")
-        }
-        for(let i in inpArr){
-            ansArr.includes(inpArr[i].replace(/[!@#$%^&:.1?*]/g, ""))?wordsRight++:null;
-        }
+        let inpArr=input.value.toLowerCase().split(' ')
+        let ansArr=humanize(filteredAnswer.title).toLowerCase().split(' ')
+        ansArr.forEach(a=>a=a.replace(/[!@#$%^&:.'?*]/g, ""))
+        inpArr.forEach(i=>ansArr.includes(i.replace(/[!@#$%^&:.1?*]/g, ""))?wordsRight++:null)
         if(wordsRight>0){
-            isClose=true;
-        }
-        if(isClose){
-            result.innerHTML='Correct!';
             scoreItem.numEntries++;
-            if(inp.value.toLowerCase()==ans.toLowerCase()){
+            if(input.value.toLowerCase()==humanize(filteredAnswer.title).toLowerCase()){
                 score+=1;
                 result.innerHTML='Perfect!';
             }else{
-                fullNameDisplay.innerHTML+=`<p style='font-size: 20px;margin-top:10px;'>${ans}</p>`
-            }
-            
+                result.innerHTML='Correct!';
+                fullNameDisplay.innerHTML+=
+                `<p style='font-size: 20px;margin-top:10px;'>${humanize(filteredAnswer.title)}</p>`
+            }            
         }else{
             result.innerHTML+='X';
             score-=1;
-            fillOutAnswers(list,ans2)
+            fillOutAnswers()
             multipleChoiceStage=true;
         }
     }
