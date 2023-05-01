@@ -18,7 +18,6 @@ let suggestion          =document.getElementById("suggestion");
 result.innerHTML='';
 
 let correctIndex;
-let correctAnime;
 let seriesList;
 let filteredAnswer;
 
@@ -301,11 +300,11 @@ let generateSuggestionBox=()=>{
 
 
 //runs through potential answers until a valid one is found
-async function filterAnswers(SL){
-    let answer= await resolveAnswer(SL);
+async function filterAnswers(){
+    let answer= await resolveAnswer(seriesList);
     let correctAnswer=await resolveProperAnswer(answer);
     if(!correctAnswer)
-        return await filterAnswers(SL);
+        return await filterAnswers();
     return {
             title:answer,
             choice:correctAnswer
@@ -367,7 +366,7 @@ let verifyOrContinue=()=>{
 //Main body
 async function buildGame(){
     seriesList=await bypassCors(`${url}tag.json%3Flimit%3D0%26type%3D3`);
-    filteredAnswer=await filterAnswers(seriesList);
+    filteredAnswer=await filterAnswers();
     generateSuggestionBox();  
     let videoContent = await filteredAnswer.choice.file_url
     videoPlayer.innerHTML=`<video width="100%" loop muted autoplay src="${videoContent}"></video>`
