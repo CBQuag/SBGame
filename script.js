@@ -12,6 +12,8 @@ let restartButton       =document.getElementById('restart-button');
 let currentScoreDisplay =document.getElementById('current-score');
 let highScoreDisplay    =document.getElementById('high-score');
 let triesLeft           =document.getElementById('tries-left');
+let input               =document.getElementById("input");
+let suggestion          =document.getElementById("suggestion");
 
 result.innerHTML='';
 
@@ -37,16 +39,19 @@ scoreItem?null:scoreItem={
     numEntries: 0
 };
 
-
 currentScoreDisplay.innerHTML+=scoreItem.score;
 highScoreDisplay.innerHTML+=scoreItem.topScore;
-
 
 //draws x's for strikes
 triesLeft.innerHTML=''
 for(let x=0;x<scoreItem.misses;x++){
     triesLeft.innerHTML+='X'
 }
+
+window.onload = () => {
+    input.value = "";
+    suggestion.innerHTML = "";
+}; 
 
 
 //Connects to an api that bypasses cors restrictions
@@ -251,56 +256,37 @@ let fillOutAnswers=()=>{
 //draws the text box for entry, and gives it the capability to 
 //make suggestions based on the complete list of series available
 let generateSuggestionBox=()=>{
-    let answer=humanize(filteredAnswer.title)
-
-    let anime = [];
-    seriesList.forEach(n=>{
-        anime.push(humanize(n.name))
-    })
-    anime.sort();
-
-    let input = document.getElementById("input");
     input.focus();
-    let suggestion = document.getElementById("suggestion");
-    const enterKey = 13;
-    const rightArrow=39;
-    window.onload = () => {
-        input.value = "";
-        suggestion.innerHTML = "";
-    };       
+    let answer=humanize(filteredAnswer.title)    
     const caseCheck = (word) => {
-    word = word.split("");
-    let inp = input.value;
-    for (let i in inp) {
-        if (inp[i] == word[i]) {
-            continue;
-        } else if (inp[i].toUpperCase() == word[i]) {
-            word.splice(i, 1, word[i].toLowerCase());
-        } else {
-            word.splice(i, 1, word[i].toUpperCase());
+        word = word.split('');
+        let inp = input.value;
+        for (let i in inp) {
+            if(word[i].toUpperCase() == inp[i]) 
+                word.splice(i, 1, word[i].toUpperCase());
+            if(word[i].toLowerCase() == inp[i])
+                word.splice(i, 1, word[i].toLowerCase());
         }
-        }
-        return word.join("");
+        return word.join('');
     };
     input.addEventListener("input", (e) => {
         suggestion.innerHTML = "";
-        let regex = new RegExp("^" + input.value, "i");
-        for (let i in anime) {
-            if (regex.test(anime[i]) && input.value != "") {
-                anime[i] = caseCheck(anime[i]);
-                suggestion.innerHTML = anime[i];
+        let regex = new RegExp(`^${input.value}`, 'i');
+        for (let i in seriesList) {
+            if (regex.test(humanize(seriesList[i].name)) && input.value != '') {
+                suggestion.innerHTML = caseCheck(humanize(seriesList[i].name));
                 break;
             }
         }
     });
-    input.addEventListener("keydown", (e) => {
-        if (e.keyCode == rightArrow && suggestion.innerText != "") {
+    input.addEventListener('keydown', (e) => {
+        if (e.code == 'ArrowRight' && suggestion.innerText != '') {
             e.preventDefault();
             input.value = suggestion.innerText;
-            suggestion.innerHTML = "";            
-        }else if (e.keyCode == enterKey) {
+            suggestion.innerHTML = '';            
+        }else if (e.code == 'Enter') {
             e.preventDefault();
-            suggestion.innerHTML = "";  
+            suggestion.innerHTML = '';  
             verifyOrContinue(input,answer);
             resolveScore()                  
         }
