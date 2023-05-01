@@ -120,6 +120,8 @@ ul{
     }
     #main-content{
         display: flex;
+        justify-content: space-around;
+        padding-right: 7%;
         align-items: center;
         max-width: 2000px;
     }
