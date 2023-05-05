@@ -1,4 +1,3 @@
-let multipleChoiceStage=false;
 
 let videoPlayer         =document.querySelector('#video-box');
 let legend              =document.querySelector('legend');
@@ -16,6 +15,7 @@ let input               =document.getElementById("input");
 let suggestion          =document.getElementById("suggestion");
 
 result.innerHTML='';
+let multipleChoiceStage=false;
 
 let correctIndex;
 let seriesList;
@@ -101,7 +101,8 @@ let getRandomTitle=(source)=>{
 };
 
 
-//function that gets a random video link
+//function that gets a random validated video link, or returns false
+//if none of the results satisfy the right conditions
 validateVideoContent=(promiseResults)=>{
     let linkList=[];
     promiseResults.forEach(p=>linkList.push(p));
@@ -178,6 +179,7 @@ let endGame=()=>{
     scoreItem.numEntries=0;
     wait=8500;
 }
+
 
 //checks if either three tries have been made or the correct answer,
 //then sends the points to the total
@@ -290,7 +292,6 @@ let generateSuggestionBox=()=>{
             resolveScore()                  
         }
     });
-
     submitButton.addEventListener('click',(e)=>{
         e.preventDefault();
         verifyOrContinue();
@@ -315,7 +316,6 @@ async function filterAnswers(){
 //provides functionality to the submit button to check inputs over multiple 
 //stages of the game, and adjusts the score awarded
 let verifyOrContinue=()=>{
-
     document.addEventListener('keypress', (e)=>{
         let keyIndex=e.code.slice(e.code.length-1);
         if((keyIndex<=0)||(keyIndex>4))
